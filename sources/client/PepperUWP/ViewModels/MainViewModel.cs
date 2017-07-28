@@ -1,8 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using Windows.UI.Core;
+using Windows.UI.Xaml;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
-using GalaSoft.MvvmLight.Messaging;
-using Microsoft.Practices.ServiceLocation;
+using GalaSoft.MvvmLight.Threading;
 using PepperUWP.Services;
 
 namespace PepperUWP.ViewModels
@@ -30,7 +33,10 @@ namespace PepperUWP.ViewModels
 
         private void SpeechService_ResultGenerated(object sender, string e)
         {
-            TextSpeech = e;
+            DispatcherHelper.CheckBeginInvokeOnUI(() =>
+            {
+                TextSpeech = e;
+            });
         }
     }
 }

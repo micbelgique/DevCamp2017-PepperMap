@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Globalization;
@@ -28,7 +29,9 @@ namespace PepperUWP.Services
             if (args.Result.Confidence == SpeechRecognitionConfidence.Medium ||
                 args.Result.Confidence == SpeechRecognitionConfidence.High)
             {
+                Debug.Write($"Listen : {args.Result.Text}");
                 _dictatedTextBuilder.Append(args.Result.Text + " ");
+                OnResultGenerated(_dictatedTextBuilder.ToString());
             }
         }
 
@@ -45,9 +48,10 @@ namespace PepperUWP.Services
                         OnResultGenerated(sentence);
                     }
                 }
-
-                await Task.Delay(3000);
-                await Init();
+            }
+            else
+            {
+                Start();
             }
         }
 
@@ -56,14 +60,13 @@ namespace PepperUWP.Services
             if (SpeechRecognizer != null)
             {
                 await SpeechRecognizer.ContinuousRecognitionSession.CancelAsync();
-                SpeechRecognizer.Dispose();
             }
 
-            var language = new Windows.Globalization.Language("en-US");
+            var language = new Language("fr-FR");
             SpeechRecognizer = new SpeechRecognizer(language);
 
             SpeechRecognizer.StateChanged += SpeechRecognizer_StateChanged;
-            SpeechRecognizer.ContinuousRecognitionSession.AutoStopSilenceTimeout = new TimeSpan(0, 0, 20);
+            SpeechRecognizer.ContinuousRecognitionSession.AutoStopSilenceTimeout = new TimeSpan(0, 0, 5);
             SpeechRecognizer.ContinuousRecognitionSession.Completed += ContinuousRecognitionSession_Completed;
             SpeechRecognizer.ContinuousRecognitionSession.ResultGenerated += ContinuousRecognitionSession_ResultGenerated;
 
@@ -78,6 +81,7 @@ namespace PepperUWP.Services
 
         private async void SpeechRecognizer_StateChanged(SpeechRecognizer sender, SpeechRecognizerStateChangedEventArgs args)
         {
+            Debug.WriteLine($"State : {args.State}");
             if (args.State == SpeechRecognizerState.Idle)
             {
                 await Start();
@@ -87,14 +91,9 @@ namespace PepperUWP.Services
         public async Task Start()
         {
             _dictatedTextBuilder = new StringBuilder();
-            if (SpeechRecognizer.State != SpeechRecognizerState.Idle)
-            {
-                await SpeechRecognizer.ContinuousRecognitionSession.CancelAsync();
-            }
-            else
-            {
-                await SpeechRecognizer.ContinuousRecognitionSession.StartAsync();
-            }
+            await SpeechRecognizer.ContinuousRecognitionSession.StartAsync(SpeechContinuousRecognitionMode.Default);
+
+            Debug.WriteLine($"Call : Start()");
         }
 
         protected virtual void OnResultGenerated(string e)

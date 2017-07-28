@@ -14,6 +14,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using GalaSoft.MvvmLight.Threading;
 
 namespace PepperUWP
 {
@@ -40,6 +41,8 @@ namespace PepperUWP
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
             Frame rootFrame = Window.Current.Content as Frame;
+
+            DispatcherHelper.Initialize();
 
             // Do not repeat app initialization when the Window already has content,
             // just ensure that the window is active
