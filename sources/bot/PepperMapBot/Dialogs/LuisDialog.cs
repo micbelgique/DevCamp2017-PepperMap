@@ -31,7 +31,7 @@ namespace PepperMapBot.Dialogs
         public async Task Goto(IDialogContext context, LuisResult result)
         {
             string message = string.Empty;
-            if (result.Entities == null)
+            if (result.Entities == null || result.Entities.Count == 0)
             {
                 message = "Je ne connais pas cette destination";
             }
