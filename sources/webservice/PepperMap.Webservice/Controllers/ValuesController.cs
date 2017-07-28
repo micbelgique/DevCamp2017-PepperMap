@@ -1,19 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PepperMap.Infrastructure.Database;
 
 namespace PepperMap.Webservice.Controllers
 {
     [Route("api/[controller]")]
     public class ValuesController : Controller
     {
+
+        private readonly DatabaseContext _context;
+
+        public ValuesController(DatabaseContext context)
+        {
+            _context = context;
+        }
+
         // GET api/values
         [HttpGet]
-        public IEnumerable<string> Get()
+        public async Task<IEnumerable<string>> GetAsync()
         {
-            return new string[] { "value1", "value2" };
+            return await _context.Routes.Select(r => $"{r.Number.Trim()} - {r.Indicator.Trim()}").ToListAsync();
         }
 
         // GET api/values/5
