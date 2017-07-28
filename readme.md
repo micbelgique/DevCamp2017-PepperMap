@@ -19,9 +19,9 @@ Beacons
 ## Authors
 
 * **Adrien Clerbois** - ** - [AClerbois](https://github.com/aclerbois)
-* **Denis Voituron** - ** - [AClerbois](https://github.com/dvoituron)
-* **Michael Fiorito** - ** - [AClerbois](https://github.com/mfiorito)
-* **Renaud Dumont** - ** - [AClerbois](https://github.com/MrRenaud)
+* **Denis Voituron** - ** - [dvoituron](https://github.com/dvoituron)
+* **Michael Fiorito** - ** - [mfiorito](https://github.com/mfiorito)
+* **Renaud Dumont** - ** - [MrRenaud](https://github.com/MrRenaud)
 
 ## License
 
