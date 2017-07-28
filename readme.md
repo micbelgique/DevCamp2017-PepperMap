@@ -2,21 +2,21 @@
 
 # Project Title
 
-FamiDesk 
+PepperMap 
 
 ## Getting Started
 
-Envie de jouer avec des beacons pour faire de la géolocalisation automatique ?
+Envie de tester les ChatBots et pourquoi pas la reconnaissance vocale dans le domaine hospitalier ?
 
-Description courte : FamiDesk a pour mission de préserver l’autonomie des personnes en rassemblant autour d’eux professionnels de la santé, aidant proches, voisins, livreurs, famille, amis et bien d’autres. Afin de ne pas s’emmêler les pinceaux dans ces multiples interactions, ils ont développé un cahier de communication en ligne permettant à chacune des aides de pouvoir notifier son passage et son action. C’est ce processus qu’ils souhaitent améliorer en rendant automatique l’identification des aidants à leur arrivée dans la maison de la personne. L’idée ? Un beacon identifie directement la personne à son arrivée et fait apparaitre une notification de checkin sur son téléphone. Rien de plus simple !
+Qui ne s’est jamais perdu dans le dédale des routes d’un hôpital ? Le CHR Citadelle de Liège est bien conscient du problème et souhaite le résoudre d’une manière innovante : mettre à la disposition des visiteurs des tables tactiles placées aux endroits stratégiques. Celles-ci dialogueront avec les personnes pour les guider au mieux dans l’hôpital en leur donnant des indications simples et personnalisées. Vous devrez donc recourir à des services de reconnaissance vocale ainsi qu’à une logique conversationnelle (chatbot, LUIS) connectée à la base de données des routes de l’institution.  En septembre, le projet servira d’intelligence pour le robot Pepper qui sera installé à l’accueil du CHR.
 
 ### Technologies
 
-Mobile, Beacon, Bluetooth
+Chatbots, intelligence de langage, cognitives services 
 
 ### Matériel mis à disposition
 
-Beacons
+Tablette tactile
 
 ## Authors
 
