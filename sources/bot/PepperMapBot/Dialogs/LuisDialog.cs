@@ -23,14 +23,14 @@ namespace PepperMapBot.Dialogs
             this.Routes = routesService;
         }
 
+        #region MAIN_INTENTS
+
         [LuisIntent("")]
         [LuisIntent("None")]
         public async Task None(IDialogContext context, LuisResult result)
         {
-            string message = $"Désolé je ne comprends pas '{result.Query}'.";
-
-            await context.PostAsync(message);
-
+            await context.PostAsync($"Désolé je ne comprends pas '{result.Query}'.");
+            await context.PostAsync(" Avez-vous un rendez-vous ou est-ce que vous cherchez un service ?");
             context.Wait(this.MessageReceived);
         }
 
@@ -52,7 +52,6 @@ namespace PepperMapBot.Dialogs
 
             context.Wait(this.MessageReceived);
         }
-
 
         [LuisIntent("Hello")]
         public async Task Hello(IDialogContext context, LuisResult result)
@@ -78,23 +77,9 @@ namespace PepperMapBot.Dialogs
             }
             else
             {
-                string message = "Bonjour. Etes-vous êtes un patient ou un visiteur ?";
-                await context.PostAsync(message);
+                await context.PostAsync("Bonjour. Je m'appelle Pepper, à votre service ! Etes-vous êtes un patient ou un visiteur ?");
                 context.Wait(this.IdentityUserType);
             }
-        }
-
-        public async Task IdentityUserType(IDialogContext context, IAwaitable<IMessageActivity> item)
-        {
-            var message = await item;
-            string text = message.Text;
-            if(text.ToUpper().Contains("VISITEUR"))
-                await context.PostAsync("Avez-vous un rendez-vous ? ou cherchez vous un de nos services ?");
-
-            if (text.ToUpper().Contains("PATIENT"))
-                await context.PostAsync("Est-ce que vous cherchez un de nos services ?");
-
-            context.Wait(this.MessageReceived);
         }
 
         [LuisIntent("Meeting")]
@@ -102,11 +87,47 @@ namespace PepperMapBot.Dialogs
         {
             string message = "#MEETING#";
 
-         
+
             await context.PostAsync(message);
             context.Wait(this.MessageReceived);
         }
 
+        #endregion
+
+
+        public async Task IdentityUserType(IDialogContext context, IAwaitable<IMessageActivity> item)
+        {
+            var message = await item;
+            string text = message.Text;
+            if (text.ToUpper().Contains("VISITEUR"))
+            {
+                await context.PostAsync("Avez-vous un rendez-vous ? ou cherchez vous un de nos services ?");
+                context.Done(new object { });
+            }
+            else
+            {
+                if (text.ToUpper().Contains("PATIENT"))
+                {
+                    await context.PostAsync("Est-ce que vous cherchez un de nos services ?");
+                    context.Wait(this.AfterIdentityUserTypePatientSimpleAnswer);
+                }
+            }
+        }
+
+        public async Task AfterIdentityUserTypePatientSimpleAnswer(IDialogContext context, IAwaitable<IMessageActivity> item)
+        {
+            var message = await item;
+            string text = message.Text;
+            if (text.ToUpper().Contains("OUI"))
+                await context.PostAsync("Quel service cherchez vous ?");
+
+            if (text.ToUpper().Contains("NON"))
+                await context.PostAsync("Comment puis-je vous aider ?");
+
+            context.Done(new object { });
+        }
+
+        
 
     }
 }
