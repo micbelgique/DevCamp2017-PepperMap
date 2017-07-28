@@ -8,7 +8,7 @@ using Microsoft.Bot.Builder.FormFlow;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
-
+using PepperMapBot.Services;
 
 namespace PepperMapBot.Dialogs
 {
@@ -16,6 +16,13 @@ namespace PepperMapBot.Dialogs
     [Serializable]
     public class LuisDialog : LuisDialog<object>
     {
+        public RouteService Routes { get; private set; }
+
+        public LuisDialog(RouteService routesService) : base()
+        {
+            this.Routes = routesService;
+        }
+
         [LuisIntent("")]
         [LuisIntent("None")]
         public async Task None(IDialogContext context, LuisResult result)
@@ -38,7 +45,7 @@ namespace PepperMapBot.Dialogs
 
             foreach (var entity in result.Entities)
             {
-                message = $"Pour vous rendre en '{entity.Entity}', suivez la route 1";
+                message = $"Pour vous rendre en '{entity.Entity}', suivez la route '{this.Routes.GetRoutes(entity.Entity)}'";
             }
 
             await context.PostAsync(message);

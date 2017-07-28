@@ -4,11 +4,12 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
+using PepperMapBot.Controllers;
 
 namespace PepperMapBot
 {
     [BotAuthentication]
-    public class MessagesController : ApiController
+    public class MessagesController : BaseController
     {
         /// <summary>
         /// POST: api/Messages
@@ -18,7 +19,7 @@ namespace PepperMapBot
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                await Conversation.SendAsync(activity, () => new Dialogs.LuisDialog());
+                await Conversation.SendAsync(activity, () => new Dialogs.LuisDialog(this.Routes));
             }
             else
             {
