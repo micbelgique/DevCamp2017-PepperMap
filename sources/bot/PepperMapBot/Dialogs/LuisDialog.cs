@@ -59,15 +59,56 @@ namespace PepperMapBot.Dialogs
         [LuisIntent("Hello")]
         public async Task Hello(IDialogContext context, LuisResult result)
         {
-            string message = string.Empty;
-            if (result.Entities == null || result.Entities.Count == 0)
+            if (result.Entities != null && result.Entities.Count > 0)
             {
-                message = "Bonjour. Etes-vous êtes un patient ou un visiteur ?";
-            }
+                var entity = result.Entities.FirstOrDefault();
 
-            await context.PostAsync(message);
+                switch (entity.Entity.ToUpper())
+                {
+                    case "VISITEUR":
+                        await context.PostAsync("Avez-vous un rendez-vous ? ou cherchez vous un de nos services ?");
+                        context.Wait(this.MessageReceived);
+                        break;
+                    case "PATIENT":
+                        await context.PostAsync("Est-ce que vous cherchez un de nos services ?");
+                        context.Wait(this.MessageReceived);
+                        break;
+                    default:
+
+                        break;
+                }
+            }
+            else
+            {
+                string message = "Bonjour. Etes-vous êtes un patient ou un visiteur ?";
+                await context.PostAsync(message);
+                context.Wait(this.IdentityUserType);
+            }
+        }
+
+        public async Task IdentityUserType(IDialogContext context, IAwaitable<IMessageActivity> item)
+        {
+            var message = await item;
+            string text = message.Text;
+            if(text.ToUpper().Contains("VISITEUR"))
+                await context.PostAsync("Avez-vous un rendez-vous ? ou cherchez vous un de nos services ?");
+
+            if (text.ToUpper().Contains("PATIENT"))
+                await context.PostAsync("Est-ce que vous cherchez un de nos services ?");
 
             context.Wait(MessageReceived);
         }
+
+        [LuisIntent("Meeting")]
+        public async Task Meeting(IDialogContext context, LuisResult result)
+        {
+            string message = "#MEETING#";
+
+         
+            await context.PostAsync(message);
+            context.Wait(this.MessageReceived);
+        }
+
+
     }
 }
