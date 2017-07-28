@@ -52,5 +52,20 @@ namespace PepperMapBot.Dialogs
 
             context.Wait(this.MessageReceived);
         }
+
+
+        [LuisIntent("Hello")]
+        public async Task Hello(IDialogContext context, LuisResult result)
+        {
+            string message = string.Empty;
+            if (result.Entities == null || result.Entities.Count == 0)
+            {
+                message = "Bonjour. Etes-vous êtes un patient ou un visiteur ?";
+            }
+
+            await context.PostAsync(message);
+
+            context.Wait(this.MessageReceived);
+        }
     }
 }
