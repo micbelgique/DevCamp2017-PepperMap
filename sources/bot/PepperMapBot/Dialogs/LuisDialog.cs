@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Builder.FormFlow;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
-using Microsoft.Bot.Connector;
-using PepperMapBot.Services;
+using PepperMap.Infrastructure.Interfaces;
 
 namespace PepperMapBot.Dialogs
 {
@@ -16,11 +12,11 @@ namespace PepperMapBot.Dialogs
     [Serializable]
     public class LuisDialog : LuisDialog<object>
     {
-        public RouteService Routes { get; private set; }
+        private readonly IRouteService _routeService;
 
-        public LuisDialog(RouteService routesService) : base()
+        public LuisDialog(IRouteService routeService)
         {
-            this.Routes = routesService;
+            _routeService = routeService;
         }
 
         [LuisIntent("")]
@@ -31,26 +27,32 @@ namespace PepperMapBot.Dialogs
 
             await context.PostAsync(message);
 
-            context.Wait(this.MessageReceived);
+            context.Wait(MessageReceived);
         }
 
         [LuisIntent("GoTo")]
         public async Task Goto(IDialogContext context, LuisResult result)
         {
-            string message = string.Empty;
+            var message = string.Empty;
             if (result.Entities == null || result.Entities.Count == 0)
             {
                 message = "Je ne connais pas cette destination";
             }
-
-            foreach (var entity in result.Entities)
+            else
             {
-                message = $"Pour vous rendre en '{entity.Entity}', suivez la route '{this.Routes.GetRoutes(entity.Entity)}'";
+                foreach (var entity in result.Entities)
+                {
+                    var routeResult = await _routeService.GetRoutesAsync(entity.Entity);
+                    var route = routeResult.FirstOrDefault();
+                    message = route != null 
+                        ? $"Pour vous rendre en '{route.DestinationName}', suivez la route '{route}'" 
+                        : "Je ne connais pas cette destination";
+                }
             }
 
             await context.PostAsync(message);
 
-            context.Wait(this.MessageReceived);
+            context.Wait(MessageReceived);
         }
 
 
@@ -65,7 +67,7 @@ namespace PepperMapBot.Dialogs
 
             await context.PostAsync(message);
 
-            context.Wait(this.MessageReceived);
+            context.Wait(MessageReceived);
         }
     }
 }

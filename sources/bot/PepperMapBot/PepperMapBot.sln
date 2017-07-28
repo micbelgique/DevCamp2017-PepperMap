@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.26430.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PepperMapBot", "PepperMapBot.csproj", "{B96B3EDB-B490-44CA-A26C-527F860813F6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PepperMap.Infrastructure", "..\PepperMap.Infrastructure\PepperMap.Infrastructure.csproj", "{99C745D5-FABD-4808-9F20-26E191A8A67E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PepperMap.Domain", "PepperMap.Domain\PepperMap.Domain.csproj", "{74035B0B-CC54-40CE-BA05-AE401C85A5A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{B96B3EDB-B490-44CA-A26C-527F860813F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B96B3EDB-B490-44CA-A26C-527F860813F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B96B3EDB-B490-44CA-A26C-527F860813F6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{99C745D5-FABD-4808-9F20-26E191A8A67E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99C745D5-FABD-4808-9F20-26E191A8A67E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99C745D5-FABD-4808-9F20-26E191A8A67E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99C745D5-FABD-4808-9F20-26E191A8A67E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{74035B0B-CC54-40CE-BA05-AE401C85A5A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{74035B0B-CC54-40CE-BA05-AE401C85A5A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{74035B0B-CC54-40CE-BA05-AE401C85A5A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{74035B0B-CC54-40CE-BA05-AE401C85A5A3}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

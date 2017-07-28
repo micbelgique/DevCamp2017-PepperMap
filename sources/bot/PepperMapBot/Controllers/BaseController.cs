@@ -1,9 +1,6 @@
-﻿using PepperMapBot.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Http;
+﻿using System.Web.Http;
+using System.Web.Mvc;
+using PepperMap.Infrastructure.Interfaces;
 
 namespace PepperMapBot.Controllers
 {
@@ -12,15 +9,10 @@ namespace PepperMapBot.Controllers
     /// </summary>
     public abstract class BaseController : ApiController
     {
-        private RouteService _routes;
-        public RouteService Routes
+        protected BaseController()
         {
-            get
-            {
-                if (_routes == null)
-                    _routes = new RouteService();
-                return _routes;
-            }
+            RouteService = DependencyResolver.Current.GetService<IRouteService>();
         }
+        public IRouteService RouteService { get; protected set; }
     }
 }
