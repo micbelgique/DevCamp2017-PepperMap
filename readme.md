@@ -1,3 +1,5 @@
+![alt text](assets/cover.jpg)
+
 # Project Title
 
 FamiDesk 
