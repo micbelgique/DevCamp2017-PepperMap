@@ -1,10 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
+using Microsoft.Bot.Connector;
 using PepperMap.Infrastructure.Interfaces;
+using PepperMap.Infrastructure.Models;
 
 namespace PepperMapBot.Dialogs
 {
@@ -43,10 +46,24 @@ namespace PepperMapBot.Dialogs
                 foreach (var entity in result.Entities)
                 {
                     var routeResult = await _routeService.GetRoutesAsync(entity.Entity);
-                    var route = routeResult.FirstOrDefault();
-                    message = route != null 
-                        ? $"Pour vous rendre en '{route.DestinationName}', suivez la route '{route}'" 
-                        : "Je ne connais pas cette destination";
+                    var routes = routeResult as IList<Route> ?? routeResult.ToList();
+                    if (routes.Any())
+                    {
+                        if (routes.Count == 1)
+                        {
+                            var route = routes.First();
+                            message = $"Pour vous rendre en '{route.DestinationName}', suivez la route '{route}'";
+                        }
+                        else
+                        {
+                         message = $"J'ai trouvé plusieurs routes";
+                        }  
+                    }
+                    else
+                    {
+                        message = "Je n'ai pas trouvé de résultat à votre recherche";
+                    }
+
                 }
             }
 
@@ -90,7 +107,7 @@ namespace PepperMapBot.Dialogs
         {
             var message = await item;
             string text = message.Text;
-            if(text.ToUpper().Contains("VISITEUR"))
+            if (text.ToUpper().Contains("VISITEUR"))
                 await context.PostAsync("Avez-vous un rendez-vous ? ou cherchez vous un de nos services ?");
 
             if (text.ToUpper().Contains("PATIENT"))
@@ -104,7 +121,7 @@ namespace PepperMapBot.Dialogs
         {
             string message = "#MEETING#";
 
-         
+
             await context.PostAsync(message);
             context.Wait(this.MessageReceived);
         }

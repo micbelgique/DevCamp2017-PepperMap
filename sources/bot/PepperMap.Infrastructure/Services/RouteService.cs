@@ -38,14 +38,15 @@ namespace PepperMap.Infrastructure.Services
         private string GetWebserviceUrl(string destination)
         {
             var webserviceLocationQueryUrl = _settingService
-                .GetSetting("webserviceLocationQueryUrl")
-                .Replace("param", destination);
+                .GetSetting("WebserviceLocationQueryUrl")
+                .Replace("{search}", destination);
             return webserviceLocationQueryUrl;
         }
 
         private IEnumerable<Route> TransformTextResult(string input)
         {
-            return JsonConvert.DeserializeObject<IEnumerable<Route>>(input);
+            return JsonConvert.DeserializeObject<IEnumerable<Route>>(input) 
+                ?? new List<Route>();
         }
     }
 }
