@@ -16,5 +16,17 @@ namespace PepperMap.DomainLayer.Mappers
                 RouteNumber = location.Route.Number.Trim()
             };
         }
+
+        public static Route MapRoute(Person person)
+        {
+            if (person == null) return null;
+            return new Route
+            {
+                DestinationName = person.ToString(),
+                LocationId = person.LocationId,
+                RouteIndication = person.Location.Route.Indicator.Trim(),
+                RouteNumber = person.Location.Route.Number.Trim()
+            };
+        }
     }
 }
