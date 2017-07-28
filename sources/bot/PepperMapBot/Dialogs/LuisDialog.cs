@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Web;
 using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.FormFlow;
 using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
-using PepperMap.Infrastructure.Interfaces;
-using PepperMap.Infrastructure.Models;
+using PepperMapBot.Services;
 
 namespace PepperMapBot.Dialogs
 {
@@ -15,63 +16,42 @@ namespace PepperMapBot.Dialogs
     [Serializable]
     public class LuisDialog : LuisDialog<object>
     {
-        private readonly IRouteService _routeService;
+        public RouteService Routes { get; private set; }
 
-        public LuisDialog(IRouteService routeService)
+        public LuisDialog(RouteService routesService) : base()
         {
-            _routeService = routeService;
+            this.Routes = routesService;
         }
+
+        #region MAIN_INTENTS
 
         [LuisIntent("")]
         [LuisIntent("None")]
         public async Task None(IDialogContext context, LuisResult result)
         {
-            string message = $"Désolé je ne comprends pas '{result.Query}'.";
-
-            await context.PostAsync(message);
-
-            context.Wait(MessageReceived);
+            await context.PostAsync($"Désolé je ne comprends pas '{result.Query}'.");
+            await context.PostAsync(" Avez-vous un rendez-vous ou est-ce que vous cherchez un service ?");
+            context.Wait(this.MessageReceived);
         }
 
         [LuisIntent("GoTo")]
         public async Task Goto(IDialogContext context, LuisResult result)
         {
-            var message = string.Empty;
+            string message = string.Empty;
             if (result.Entities == null || result.Entities.Count == 0)
             {
                 message = "Je ne connais pas cette destination";
             }
-            else
-            {
-                foreach (var entity in result.Entities)
-                {
-                    var routeResult = await _routeService.GetRoutesAsync(entity.Entity);
-                    var routes = routeResult as IList<Route> ?? routeResult.ToList();
-                    if (routes.Any())
-                    {
-                        if (routes.Count == 1)
-                        {
-                            var route = routes.First();
-                            message = $"Pour vous rendre en '{route.DestinationName}', suivez la route '{route}'";
-                        }
-                        else
-                        {
-                         message = $"J'ai trouvé plusieurs routes";
-                        }  
-                    }
-                    else
-                    {
-                        message = "Je n'ai pas trouvé de résultat à votre recherche";
-                    }
 
-                }
+            foreach (var entity in result.Entities)
+            {
+                message = $"Pour vous rendre en '{entity.Entity}', suivez la route '{this.Routes.GetRoutes(entity.Entity)}'";
             }
 
             await context.PostAsync(message);
 
-            context.Wait(MessageReceived);
+            context.Wait(this.MessageReceived);
         }
-
 
         [LuisIntent("Hello")]
         public async Task Hello(IDialogContext context, LuisResult result)
@@ -97,23 +77,9 @@ namespace PepperMapBot.Dialogs
             }
             else
             {
-                string message = "Bonjour. Etes-vous êtes un patient ou un visiteur ?";
-                await context.PostAsync(message);
+                await context.PostAsync("Bonjour. Je m'appelle Pepper, à votre service ! Etes-vous êtes un patient ou un visiteur ?");
                 context.Wait(this.IdentityUserType);
             }
-        }
-
-        public async Task IdentityUserType(IDialogContext context, IAwaitable<IMessageActivity> item)
-        {
-            var message = await item;
-            string text = message.Text;
-            if (text.ToUpper().Contains("VISITEUR"))
-                await context.PostAsync("Avez-vous un rendez-vous ? ou cherchez vous un de nos services ?");
-
-            if (text.ToUpper().Contains("PATIENT"))
-                await context.PostAsync("Est-ce que vous cherchez un de nos services ?");
-
-            context.Wait(MessageReceived);
         }
 
         [LuisIntent("Meeting")]
@@ -126,6 +92,42 @@ namespace PepperMapBot.Dialogs
             context.Wait(this.MessageReceived);
         }
 
+        #endregion
+
+
+        public async Task IdentityUserType(IDialogContext context, IAwaitable<IMessageActivity> item)
+        {
+            var message = await item;
+            string text = message.Text;
+            if (text.ToUpper().Contains("VISITEUR"))
+            {
+                await context.PostAsync("Avez-vous un rendez-vous ? ou cherchez vous un de nos services ?");
+                context.Done(new object { });
+            }
+            else
+            {
+                if (text.ToUpper().Contains("PATIENT"))
+                {
+                    await context.PostAsync("Est-ce que vous cherchez un de nos services ?");
+                    context.Wait(this.AfterIdentityUserTypePatientSimpleAnswer);
+                }
+            }
+        }
+
+        public async Task AfterIdentityUserTypePatientSimpleAnswer(IDialogContext context, IAwaitable<IMessageActivity> item)
+        {
+            var message = await item;
+            string text = message.Text;
+            if (text.ToUpper().Contains("OUI"))
+                await context.PostAsync("Quel service cherchez vous ?");
+
+            if (text.ToUpper().Contains("NON"))
+                await context.PostAsync("Comment puis-je vous aider ?");
+
+            context.Done(new object { });
+        }
+
+        
 
     }
 }
