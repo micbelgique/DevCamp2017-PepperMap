@@ -62,23 +62,7 @@ namespace PepperMapBot.Dialogs
             context.Wait(this.MessageReceived);
         }
 
-        [LuisIntent("SpecificDestination")]
-        public async Task SpecificDestination(IDialogContext context, LuisResult result)
-        {
-            if (result.Entities == null || result.Entities.Count == 0)
-            {
-                await context.PostAsync("Je n'ai pas bien compris, quel service cherchez-vous ?");
-                context.Wait(this.MessageReceived);
-
-            }
-            foreach (var entity in result.Entities)
-            {
-                var routes = await this.Routes.GetPublicRoutesAsync(entity.Entity);
-                await context.PostAsync($"Pour vous rendre en '{entity.Entity}', suivez la route '{routes.FirstOrDefault()}'");
-            }
-        }
-
-        [LuisIntent("Meeting")]
+       [LuisIntent("Meeting")]
         public async Task Meeting(IDialogContext context, LuisResult result)
         {
             if(result.Entities.Count > 0)
@@ -99,47 +83,29 @@ namespace PepperMapBot.Dialogs
             }
         }
 
+        /// <summary>
+        /// Special service that don't require meeting
+        /// </summary>
+        /// <param name="serviceName"></param>
+        /// <returns></returns>
+        private bool IsSpecialService(string serviceName)
+        {
+            if (serviceName.ToUpper().Contains("NUCL") || serviceName.ToUpper().Contains("PHYSIQUE") || serviceName.ToUpper().Contains("IMAGERIE"))
+                return true;
+            else
+                return false;
+        }
+
         #endregion
         private async Task MeetingDetectedAskForService(IDialogContext context, IAwaitable<IMessageActivity> item)
         {
+            //var message = await item;
+            //string text = message.Text;
+            //if(text.ToUpper().Contains("NUCL") || text.ToUpper().Contains("PHYSIQUE") || text.ToUpper().Contains("IMAGERIE"))
+            //{
+            //    await context.PostAsync($"Pour vous rendre en '{entity.Entity}', suivez la route '{routes.FirstOrDefault()}'");
+            //}
             await MessageReceived(context, item);
         }
-
-        //protected override Task MessageReceived(IDialogContext context, IAwaitable<IMessageActivity> item)
-        //{
-        //    return base.MessageReceived(context, item);
-        //}
-
-        //private async Task AfterHelloVisitOrMeeting(IDialogContext context, IAwaitable<IMessageActivity> item)
-        //{
-        //    var message = await item;
-        //    string text = message.Text;
-        //    if (text.ToUpper().Contains("RENDEZ") || text.ToUpper().Contains("RDV"))
-        //    {
-        //        context.Wait(this.MeetingDetectedAskForService);
-        //    }
-        //    else
-        //    {
-        //        if (text.ToUpper().Contains("CHERCHE"))
-        //        {
-        //            await context.PostAsync("Est-ce que vous cherchez un de nos services ?");
-        //            context.Wait(this.AfterIdentityUserTypePatientSimpleAnswer);
-        //        }
-        //    }
-        //}
-
-        //public async Task AfterIdentityUserTypePatientSimpleAnswer(IDialogContext context, IAwaitable<IMessageActivity> item)
-        //{
-        //    var message = await item;
-        //    string text = message.Text;
-        //    if (text.ToUpper().Contains("OUI"))
-        //        await context.PostAsync("Quel service cherchez vous ?");
-
-        //    if (text.ToUpper().Contains("NON"))
-        //        await context.PostAsync("Comment puis-je vous aider ?");
-
-        //    context.Done(new object { });
-        //}
-
     }
 }
