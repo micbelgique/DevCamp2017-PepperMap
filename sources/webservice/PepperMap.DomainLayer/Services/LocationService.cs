@@ -74,12 +74,20 @@ namespace PepperMap.DomainLayer.Services
             return (await GetLocationContext()
              .Where(l => l.Name.Contains(location) && funct(l))
              .ToListAsync())
+             .OrderBy(c => GetDistance(c.Name.Trim(), location))
              .Select(LocationHelper.MapRoute);
         }
 
         private string CleanString(string param)
         {
             return param.Replace(" ", "");
+        }
+
+        private decimal GetDistance(string p1, string searchFilter)
+        {
+            return string.IsNullOrEmpty(searchFilter)
+            ? 0
+            : (Math.Abs(p1.Length - searchFilter.Length)) / searchFilter.Length;
         }
 
     }
