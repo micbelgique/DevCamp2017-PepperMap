@@ -5,5 +5,6 @@
         string GetMedicalRouteUrl();
         string GetPeopleRouteUrl();
         string GetPublicRouteUrl();
+        string GetRouteNumberUrl();
     }
 }
