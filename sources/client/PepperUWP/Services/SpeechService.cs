@@ -28,29 +28,29 @@ namespace PepperUWP.Services
                 args.Result.Confidence == SpeechRecognitionConfidence.High)
             {
                 Debug.Write($"Listen : {args.Result.Text}");
-                _dictatedTextBuilder.Append(args.Result.Text + " ");
-                OnResultGenerated(_dictatedTextBuilder.ToString());
+                //_dictatedTextBuilder.Append( + " ");
+                OnResultGenerated(args.Result.Text);
             }
         }
 
         private async void ContinuousRecognitionSession_Completed(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionCompletedEventArgs args)
         {
-            if (args.Status != SpeechRecognitionResultStatus.Success)
-            {
-                if (args.Status == SpeechRecognitionResultStatus.TimeoutExceeded)
-                {
-                    var sentence = _dictatedTextBuilder.ToString();
+            Start();
+            //if (args.Status == SpeechRecognitionResultStatus.TimeoutExceeded
+            //    || args.Status == SpeechRecognitionResultStatus.Success
+            //    || args.Status == SpeechRecognitionResultStatus.UserCanceled)
+            //{
+            //    var sentence = _dictatedTextBuilder.ToString();
 
-                    if (!string.IsNullOrWhiteSpace(sentence))
-                    {
-                        OnResultGenerated(sentence);
-                    }
-                }
-            }
-            else
-            {
-                Start();
-            }
+            //    if (!string.IsNullOrWhiteSpace(sentence))
+            //    {
+            //        OnResultGenerated(sentence);
+            //    }
+            //}
+            //else
+            //{
+            //    Start();
+            //}
         }
 
         public async Task Init()
@@ -64,7 +64,7 @@ namespace PepperUWP.Services
             SpeechRecognizer = new SpeechRecognizer(language);
 
             SpeechRecognizer.StateChanged += SpeechRecognizer_StateChanged;
-            SpeechRecognizer.ContinuousRecognitionSession.AutoStopSilenceTimeout = new TimeSpan(0, 0, 5);
+            SpeechRecognizer.ContinuousRecognitionSession.AutoStopSilenceTimeout = new TimeSpan(0, 0, 3);
             SpeechRecognizer.ContinuousRecognitionSession.Completed += ContinuousRecognitionSession_Completed;
             SpeechRecognizer.ContinuousRecognitionSession.ResultGenerated += ContinuousRecognitionSession_ResultGenerated;
 

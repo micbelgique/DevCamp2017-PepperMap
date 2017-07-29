@@ -98,6 +98,8 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MediaElementExtensions.cs" />
+    <Compile Include="Messages\StreamToPlayMessage.cs" />
     <Compile Include="Messages\UserSpeakingMessage.cs" />
     <Compile Include="Messages\UserSpokeMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

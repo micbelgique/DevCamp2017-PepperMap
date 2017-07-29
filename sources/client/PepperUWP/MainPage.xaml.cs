@@ -33,9 +33,9 @@ namespace PepperUWP
             Messenger.Default.Register<StreamToPlayMessage>(this, OnMessageReceived);
         }
 
-        private void OnMessageReceived(StreamToPlayMessage obj)
+        private async void OnMessageReceived(StreamToPlayMessage obj)
         {
-            //MediaElement.PlayS(obj.Stream);
+            await MediaElement.PlayStreamAsync(obj.Stream);
         }
 
         private void MainPage_OnLoaded(object sender, RoutedEventArgs e)
