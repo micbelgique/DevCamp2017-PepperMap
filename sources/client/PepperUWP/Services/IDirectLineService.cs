@@ -8,7 +8,7 @@ namespace PepperUWP.Services
         void Connect(string connectionSecret);
         Task StartConversation();
         Task<Conversation> RenewConversation();
-        Task<ActivitySet> LoadMessages(string watermark = null);
+        Task<ActivitySet> LoadMessages();
         Task<bool> SendMessage(Activity message);
     }
 }

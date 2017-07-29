@@ -4,6 +4,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Globalization;
 using Windows.Media.SpeechRecognition;
+using Windows.Media.SpeechSynthesis;
+using Windows.Storage.Streams;
 
 namespace PepperUWP.Services
 {
@@ -95,6 +97,21 @@ namespace PepperUWP.Services
         protected virtual void OnResultGenerated(string e)
         {
             ResultGenerated?.Invoke(this, e);
+        }
+
+        public async Task<IRandomAccessStream> SynthesizeTextToSpeechAsync(string text)
+        {
+            // Windows.Storage.Streams.IRandomAccessStream
+            IRandomAccessStream stream = null;
+
+            // Windows.Media.SpeechSynthesis.SpeechSynthesizer
+            using (SpeechSynthesizer synthesizer = new SpeechSynthesizer())
+            {
+                // Windows.Media.SpeechSynthesis.SpeechSynthesisStream
+                stream = await synthesizer.SynthesizeTextToStreamAsync(text);
+            }
+
+            return (stream);
         }
     }
 }

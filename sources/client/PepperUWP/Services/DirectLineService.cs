@@ -38,11 +38,11 @@ namespace PepperUWP.Services
             return sendResponse?.Response?.StatusCode == HttpStatusCode.NoContent;
         }
 
-        public async Task<ActivitySet> LoadMessages(string watermark = null)
+        public async Task<ActivitySet> LoadMessages()
         {
             var sendResponse =
                 await DirectClient.Conversations.GetActivitiesWithHttpMessagesAsync(
-                    _conversationId, watermark);
+                    _conversationId, _watermark);
             var activities = sendResponse?.Body;
 
             _watermark = activities?.Watermark;
