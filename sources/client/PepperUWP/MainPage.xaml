@@ -8,6 +8,35 @@
       mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <TextBlock Text="{Binding TextSpeech}" FontSize="35" VerticalAlignment="Stretch" MaxLines="10" ></TextBlock>
+
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+
+        <Image Grid.RowSpan="2"
+               Grid.ColumnSpan="2"
+               Source="/Assets/cover.jpg"
+               HorizontalAlignment="Stretch"
+               Stretch="UniformToFill"
+               VerticalAlignment="Stretch"></Image>
+
+        <ListView Grid.Row="1"
+                  Grid.Column="1"
+                  IsItemClickEnabled="True"
+                  SelectionMode="None"
+                  ItemsSource="{Binding Conversations}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" TextWrapping="Wrap"></TextBlock>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+
     </Grid>
 </Page>

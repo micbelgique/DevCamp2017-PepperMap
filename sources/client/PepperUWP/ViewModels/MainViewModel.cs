@@ -1,42 +1,59 @@
-﻿using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using Windows.UI.Core;
-using Windows.UI.Xaml;
+﻿using System.Collections.ObjectModel;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 using GalaSoft.MvvmLight.Threading;
+using Microsoft.Bot.Connector.DirectLine;
 using PepperUWP.Services;
 
 namespace PepperUWP.ViewModels
 {
     public class MainViewModel : ViewModelBase
     {
-        private string _textSpeech;
+        private SpeechService _speechService;
+        private DirectLineService _directLineService;
 
-        public string TextSpeech
+        public ObservableCollection<string> Conversations { get; set; }
+
+        public MainViewModel()
         {
-            get { return _textSpeech; }
-            set
-            {
-                _textSpeech = value;
-                RaisePropertyChanged();
-            }
+            Conversations = new ObservableCollection<string>();
         }
 
-        public void Load()
+        public async void Load()
         {
-            var speechService = SimpleIoc.Default.GetInstance<SpeechService>();
-            speechService.Init();
-            speechService.ResultGenerated += SpeechService_ResultGenerated;
+            _speechService = SimpleIoc.Default.GetInstance<SpeechService>();
+            _speechService.ResultGenerated += SpeechService_ResultGenerated;
+            _speechService.Init();
+
+            _directLineService = new DirectLineService();
+            // Add a Secrets class with constants (ignored from the git repo)
+            _directLineService.Connect(Secrets.BotSecret);
+            await _directLineService.StartConversation();
         }
 
-        private void SpeechService_ResultGenerated(object sender, string e)
+        private async void SpeechService_ResultGenerated(object sender, string sentence)
         {
             DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                {
+                    Conversations.Add(sentence);
+                });
+
+            await _directLineService.SendMessage(new Activity()
             {
-                TextSpeech = e;
+                Type = ActivityTypes.Message,
+                Text = sentence,
+                From = new ChannelAccount()
+                {
+                    Id = "Pepper"
+                }
             });
+            var activitySet = await _directLineService.LoadMessages();
+            var activities = activitySet.Activities;
+
+            for (var i = 0; i < 2; i++)
+            {
+                Conversations.Add(activities[i].Text);
+            }
         }
     }
 }

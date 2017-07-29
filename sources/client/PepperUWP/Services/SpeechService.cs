@@ -4,10 +4,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Windows.Globalization;
 using Windows.Media.SpeechRecognition;
-using Windows.UI.Core;
-using Windows.UI.Xaml;
-using GalaSoft.MvvmLight.Messaging;
-using PepperUWP.Messages;
 
 namespace PepperUWP.Services
 {

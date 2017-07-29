@@ -101,6 +101,9 @@
     <Compile Include="Messages\UserSpeakingMessage.cs" />
     <Compile Include="Messages\UserSpokeMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Secrets.cs" />
+    <Compile Include="Services\DirectLineService.cs" />
+    <Compile Include="Services\IDirectLineService.cs" />
     <Compile Include="Services\SpeechService.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\ViewModelLocator.cs" />
@@ -112,6 +115,7 @@
     <None Include="PepperUWP_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Assets\cover.jpg" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
     <Content Include="Assets\SplashScreen.scale-200.png" />

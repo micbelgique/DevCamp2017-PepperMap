@@ -72,4 +72,7 @@ artifacts/
 *.log 
 *.vspscc 
 *.vssscc 
-Merge branch 'master' of https://github.com/micbelgique/DevCamp2017-Team1
+
+
+# Secrets
+/sources/client/PepperUWP/Secrets.cs
