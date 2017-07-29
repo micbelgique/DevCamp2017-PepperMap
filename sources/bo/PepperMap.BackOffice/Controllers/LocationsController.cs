@@ -1,7 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -10,6 +9,7 @@ using PepperMap.BackOffice.Data.Models;
 
 namespace PepperMap.BackOffice.Controllers
 {
+   // [Authorize]
     public class LocationsController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -48,7 +48,7 @@ namespace PepperMap.BackOffice.Controllers
         // GET: Locations/Create
         public IActionResult Create()
         {
-            ViewData["RouteId"] = new SelectList(_context.Routes, "Id", "Id");
+            ViewData["RouteId"] = new SelectList(_context.Routes.OrderBy(c => c.Number), "Id", "Number");
             return View();
         }
 
@@ -65,7 +65,7 @@ namespace PepperMap.BackOffice.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
-            ViewData["RouteId"] = new SelectList(_context.Routes, "Id", "Id", location.RouteId);
+            ViewData["RouteId"] = new SelectList(_context.Routes.OrderBy(c => c.Number), "Id", "Number", location.RouteId);
             return View(location);
         }
 
@@ -82,7 +82,7 @@ namespace PepperMap.BackOffice.Controllers
             {
                 return NotFound();
             }
-            ViewData["RouteId"] = new SelectList(_context.Routes, "Id", "Id", location.RouteId);
+            ViewData["RouteId"] = new SelectList(_context.Routes.OrderBy(c => c.Number), "Id", "Number", location.RouteId);
             return View(location);
         }
 
@@ -118,7 +118,7 @@ namespace PepperMap.BackOffice.Controllers
                 }
                 return RedirectToAction("Index");
             }
-            ViewData["RouteId"] = new SelectList(_context.Routes, "Id", "Id", location.RouteId);
+            ViewData["RouteId"] = new SelectList(_context.Routes.OrderBy(c => c.Number), "Id", "Number", location.RouteId);
             return View(location);
         }
 
