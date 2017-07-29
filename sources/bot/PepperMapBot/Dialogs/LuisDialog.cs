@@ -58,7 +58,7 @@ namespace PepperMapBot.Dialogs
         [LuisIntent("Hello")]
         public async Task Hello(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync("Bonjour. Je m'appelle Hypolite, à votre service ! Avez-vous un rendez-vous ? ou cherchez vous un de nos services ?");
+            await context.PostAsync("Bonjour. Je m'appelle Hypolite, à votre service ! Avez-vous un rendez-vous ? Cherchez vous un de nos services ou un patient ?");
             context.Wait(this.MessageReceived);
         }
 
