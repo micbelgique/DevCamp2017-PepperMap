@@ -57,7 +57,7 @@ namespace PepperMapBot.Dialogs
                     foreach (Route r in routes)
                     {
                         message += r.DestinationName;
-                    }-
+                    }
 
                     context.Wait(MultipleDestinationsFound);
                 }
