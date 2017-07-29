@@ -11,41 +11,51 @@ namespace PepperMap.Infrastructure.Services
     [Serializable]
     public class RouteService : IRouteService
     {
-        private readonly ISettingService _settingService;
+        private readonly IUrlService _urlService;
 
-        public RouteService(ISettingService settingService)
+        public RouteService(IUrlService urlService)
         {
-            _settingService = settingService;
+            _urlService = urlService;
         }
-
-        public async Task<IEnumerable<Route>> GetRoutesAsync(string destination)
+        
+        public async Task<IEnumerable<Route>> GetMedicalRoutesAsync(string destination)
         {
-            var resultText = await SearchLocation(destination);
+            var resultText = await SearchLocation(_urlService.GetMedicalRouteUrl(), destination);
             return TransformTextResult(resultText);
         }
 
-        private async Task<string> SearchLocation(string destination)
+        public async Task<IEnumerable<Route>> GetPeopleRoutesAsync(string name)
+        {
+            var resultText = await SearchLocation(_urlService.GetPeopleRouteUrl(), name);
+            return TransformTextResult(resultText);
+        }
+
+        public async Task<IEnumerable<Route>> GetPublicRoutesAsync(string destination)
+        {
+            var resultText = await SearchLocation(_urlService.GetPublicRouteUrl(), destination);
+            return TransformTextResult(resultText);
+        }
+
+        private async Task<string> SearchLocation(string url, string destination)
         {
             HttpClient client = new HttpClient();
 
-            var webserviceLocationQueryUrl = GetWebserviceUrl(destination);
+            var webserviceLocationQueryUrl = TransformUrl(url, destination);
 
             var response = await client.GetAsync(webserviceLocationQueryUrl);
 
             return await response.Content.ReadAsStringAsync();
         }
 
-        private string GetWebserviceUrl(string destination)
+        private string TransformUrl(string url, string destination)
         {
-            var webserviceLocationQueryUrl = _settingService
-                .GetSetting("WebserviceLocationQueryUrl")
-                .Replace("{search}", destination);
+            var webserviceLocationQueryUrl = url.Replace("{search}", destination);
             return webserviceLocationQueryUrl;
         }
 
         private IEnumerable<Route> TransformTextResult(string input)
         {
-            return JsonConvert.DeserializeObject<IEnumerable<Route>>(input) 
+            return JsonConvert.DeserializeObject<IEnumerable<Route>>(input)
                 ?? new List<Route>();
         }
     }
