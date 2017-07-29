@@ -11,6 +11,7 @@ using Microsoft.Bot.Connector;
 using PepperMapBot.Services;
 using System.Threading;
 using PepperMap.Infrastructure.Interfaces;
+using PepperMap.Infrastructure.Models;
 
 namespace PepperMapBot.Dialogs
 {
@@ -19,6 +20,8 @@ namespace PepperMapBot.Dialogs
     public class LuisDialog : LuisDialog<object>
     {
         public IRouteService Routes { get; private set; }
+
+        public string[] PreSelectedRoutes { get; set; }
 
         public LuisDialog(IRouteService routesService) : base()
         {
@@ -48,11 +51,29 @@ namespace PepperMapBot.Dialogs
             foreach (var entity in result.Entities)
             {
                 var routes = await this.Routes.GetPublicRoutesAsync(entity.Entity);
-                message = $"Pour vous rendre en '{entity.Entity}', suivez la route '{routes.FirstOrDefault()}'";
+                if (routes.Count() > 1)
+                {
+                    await context.PostAsync("Merci de préciser votre destination parmi : ");
+                    foreach (Route r in routes)
+                    {
+                        message += r.DestinationName;
+                    }
+
+                    context.Wait(MultipleDestinationsFound);
+                }
+                else
+                {
+                    message = $"Pour vous rendre en '{routes.ToArray()[0].DestinationName}', suivez la route '{routes.ToArray()[0].RouteIndication}' - '{routes.ToArray()[0].RouteNumber}";
+                }
             }
 
             await context.PostAsync(message);
             context.Wait(this.MessageReceived);
+        }
+
+        private async Task MultipleDestinationsFound(IDialogContext context, IAwaitable<IMessageActivity> item)
+        {
+
         }
 
         [LuisIntent("Hello")]
@@ -70,8 +91,13 @@ namespace PepperMapBot.Dialogs
                 // Service defined in intent, don't ask user
                 foreach (var entity in result.Entities)
                 {
+                    string message = string.Empty;
                     var routes = await this.Routes.GetPublicRoutesAsync(entity.Entity);
-                    await context.PostAsync($"Pour vous rendre en '{entity.Entity}', suivez la route '{routes.FirstOrDefault()}'");
+                    foreach (Route r in routes)
+                    {
+                        message += $"Pour vous rendre en '{r.DestinationName}', suivez la route '{r.RouteIndication}' - '{r.RouteNumber}";
+                    }
+                    await context.PostAsync(message);
                 }
                 context.Done(new object { });
             }
