@@ -63,9 +63,13 @@
   <ItemGroup>
     <Build Include="Tables\Routes.sql" />
     <Build Include="Tables\Locations.sql" />
+    <Build Include="Tables\People.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Data\RoutesData.sql" />
     <None Include="Data\LocationsData.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <RefactorLog Include="PepperJam.Database.refactorlog" />
   </ItemGroup>
 </Project>

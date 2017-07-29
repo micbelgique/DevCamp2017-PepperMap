@@ -28,7 +28,15 @@ namespace PepperMap.Webservice.Controllers
         [HttpGet("search/{param}")]
         public async Task<IEnumerable<Route>> Search(string param)
         {
-            return await _routeService.GetRoutesAsync(param);
+            return await _routeService.GetPublicRoutesAsync(param);
+        }
+
+
+        // GET api/values/5
+        [HttpGet("search/{param}/medical")]
+        public async Task<IEnumerable<Route>> SearchMedicalRoute(string param)
+        {
+            return await _routeService.GetMedicalRoutesAsync(param);
         }
 
     }

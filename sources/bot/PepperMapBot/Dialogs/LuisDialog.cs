@@ -47,7 +47,7 @@ namespace PepperMapBot.Dialogs
 
             foreach (var entity in result.Entities)
             {
-                var routes = await this.Routes.GetRoutesAsync(entity.Entity);
+                var routes = await this.Routes.GetPublicRoutesAsync(entity.Entity);
                 message = $"Pour vous rendre en '{entity.Entity}', suivez la route '{routes.FirstOrDefault()}'";
             }
 
@@ -73,7 +73,7 @@ namespace PepperMapBot.Dialogs
             }
             foreach (var entity in result.Entities)
             {
-                var routes = await this.Routes.GetRoutesAsync(entity.Entity);
+                var routes = await this.Routes.GetPublicRoutesAsync(entity.Entity);
                 await context.PostAsync($"Pour vous rendre en '{entity.Entity}', suivez la route '{routes.FirstOrDefault()}'");
             }
         }
@@ -86,7 +86,7 @@ namespace PepperMapBot.Dialogs
                 // Service defined in intent, don't ask user
                 foreach (var entity in result.Entities)
                 {
-                    var routes = await this.Routes.GetRoutesAsync(entity.Entity);
+                    var routes = await this.Routes.GetPublicRoutesAsync(entity.Entity);
                     await context.PostAsync($"Pour vous rendre en '{entity.Entity}', suivez la route '{routes.FirstOrDefault()}'");
                 }
                 context.Done(new object { });

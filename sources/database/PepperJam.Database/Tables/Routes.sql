@@ -2,5 +2,6 @@
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
     [Number] NCHAR(10) NULL, 
-    [Indicator] NCHAR(10) NULL
+    [Indicator] NCHAR(10) NULL,
+	[Flag] INT NOT NULL DEFAULT 0
 )
