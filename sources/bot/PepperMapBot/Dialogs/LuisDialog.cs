@@ -9,6 +9,8 @@ using Microsoft.Bot.Builder.Luis;
 using Microsoft.Bot.Builder.Luis.Models;
 using Microsoft.Bot.Connector;
 using PepperMapBot.Services;
+using System.Threading;
+using PepperMap.Infrastructure.Interfaces;
 
 namespace PepperMapBot.Dialogs
 {
@@ -16,9 +18,9 @@ namespace PepperMapBot.Dialogs
     [Serializable]
     public class LuisDialog : LuisDialog<object>
     {
-        public RouteService Routes { get; private set; }
+        public IRouteService Routes { get; private set; }
 
-        public LuisDialog(RouteService routesService) : base()
+        public LuisDialog(IRouteService routesService) : base()
         {
             this.Routes = routesService;
         }
@@ -30,7 +32,7 @@ namespace PepperMapBot.Dialogs
         public async Task None(IDialogContext context, LuisResult result)
         {
             await context.PostAsync($"Désolé je ne comprends pas '{result.Query}'.");
-            await context.PostAsync(" Avez-vous un rendez-vous ou est-ce que vous cherchez un service ?");
+            await context.PostAsync("Avez-vous un rendez-vous ou est-ce que vous cherchez un service ?");
             context.Wait(this.MessageReceived);
         }
 
@@ -45,89 +47,99 @@ namespace PepperMapBot.Dialogs
 
             foreach (var entity in result.Entities)
             {
-                message = $"Pour vous rendre en '{entity.Entity}', suivez la route '{this.Routes.GetRoutes(entity.Entity)}'";
+                var routes = await this.Routes.GetRoutesAsync(entity.Entity);
+                message = $"Pour vous rendre en '{entity.Entity}', suivez la route '{routes.FirstOrDefault()}'";
             }
 
             await context.PostAsync(message);
-
             context.Wait(this.MessageReceived);
         }
 
         [LuisIntent("Hello")]
         public async Task Hello(IDialogContext context, LuisResult result)
         {
-            if (result.Entities != null && result.Entities.Count > 0)
+            await context.PostAsync("Bonjour. Je m'appelle Hypolite, à votre service ! Avez-vous un rendez-vous ? ou cherchez vous un de nos services ?");
+            context.Wait(this.MessageReceived);
+        }
+
+        [LuisIntent("SpecificDestination")]
+        public async Task SpecificDestination(IDialogContext context, LuisResult result)
+        {
+            if (result.Entities == null || result.Entities.Count == 0)
             {
-                var entity = result.Entities.FirstOrDefault();
+                await context.PostAsync("Je n'ai pas bien compris, quel service cherchez-vous ?");
+                context.Wait(this.MessageReceived);
 
-                switch (entity.Entity.ToUpper())
-                {
-                    case "VISITEUR":
-                        await context.PostAsync("Avez-vous un rendez-vous ? ou cherchez vous un de nos services ?");
-                        context.Wait(this.MessageReceived);
-                        break;
-                    case "PATIENT":
-                        await context.PostAsync("Est-ce que vous cherchez un de nos services ?");
-                        context.Wait(this.MessageReceived);
-                        break;
-                    default:
-
-                        break;
-                }
             }
-            else
+            foreach (var entity in result.Entities)
             {
-                await context.PostAsync("Bonjour. Je m'appelle Pepper, à votre service ! Etes-vous êtes un patient ou un visiteur ?");
-                context.Wait(this.IdentityUserType);
+                var routes = await this.Routes.GetRoutesAsync(entity.Entity);
+                await context.PostAsync($"Pour vous rendre en '{entity.Entity}', suivez la route '{routes.FirstOrDefault()}'");
             }
         }
 
         [LuisIntent("Meeting")]
         public async Task Meeting(IDialogContext context, LuisResult result)
         {
-            string message = "#MEETING#";
-
-
-            await context.PostAsync(message);
-            context.Wait(this.MessageReceived);
-        }
-
-        #endregion
-
-
-        public async Task IdentityUserType(IDialogContext context, IAwaitable<IMessageActivity> item)
-        {
-            var message = await item;
-            string text = message.Text;
-            if (text.ToUpper().Contains("VISITEUR"))
+            if(result.Entities.Count > 0)
             {
-                await context.PostAsync("Avez-vous un rendez-vous ? ou cherchez vous un de nos services ?");
+                // Service defined in intent, don't ask user
+                foreach (var entity in result.Entities)
+                {
+                    var routes = await this.Routes.GetRoutesAsync(entity.Entity);
+                    await context.PostAsync($"Pour vous rendre en '{entity.Entity}', suivez la route '{routes.FirstOrDefault()}'");
+                }
                 context.Done(new object { });
             }
             else
             {
-                if (text.ToUpper().Contains("PATIENT"))
-                {
-                    await context.PostAsync("Est-ce que vous cherchez un de nos services ?");
-                    context.Wait(this.AfterIdentityUserTypePatientSimpleAnswer);
-                }
+                // ask for service
+                await context.PostAsync("Dans quel service ?");
+                context.Wait(this.MeetingDetectedAskForService);
             }
         }
 
-        public async Task AfterIdentityUserTypePatientSimpleAnswer(IDialogContext context, IAwaitable<IMessageActivity> item)
+        #endregion
+        private async Task MeetingDetectedAskForService(IDialogContext context, IAwaitable<IMessageActivity> item)
         {
-            var message = await item;
-            string text = message.Text;
-            if (text.ToUpper().Contains("OUI"))
-                await context.PostAsync("Quel service cherchez vous ?");
-
-            if (text.ToUpper().Contains("NON"))
-                await context.PostAsync("Comment puis-je vous aider ?");
-
-            context.Done(new object { });
+            await MessageReceived(context, item);
         }
 
-        
+        //protected override Task MessageReceived(IDialogContext context, IAwaitable<IMessageActivity> item)
+        //{
+        //    return base.MessageReceived(context, item);
+        //}
+
+        //private async Task AfterHelloVisitOrMeeting(IDialogContext context, IAwaitable<IMessageActivity> item)
+        //{
+        //    var message = await item;
+        //    string text = message.Text;
+        //    if (text.ToUpper().Contains("RENDEZ") || text.ToUpper().Contains("RDV"))
+        //    {
+        //        context.Wait(this.MeetingDetectedAskForService);
+        //    }
+        //    else
+        //    {
+        //        if (text.ToUpper().Contains("CHERCHE"))
+        //        {
+        //            await context.PostAsync("Est-ce que vous cherchez un de nos services ?");
+        //            context.Wait(this.AfterIdentityUserTypePatientSimpleAnswer);
+        //        }
+        //    }
+        //}
+
+        //public async Task AfterIdentityUserTypePatientSimpleAnswer(IDialogContext context, IAwaitable<IMessageActivity> item)
+        //{
+        //    var message = await item;
+        //    string text = message.Text;
+        //    if (text.ToUpper().Contains("OUI"))
+        //        await context.PostAsync("Quel service cherchez vous ?");
+
+        //    if (text.ToUpper().Contains("NON"))
+        //        await context.PostAsync("Comment puis-je vous aider ?");
+
+        //    context.Done(new object { });
+        //}
 
     }
 }
