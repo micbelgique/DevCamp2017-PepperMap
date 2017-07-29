@@ -17,23 +17,35 @@ namespace PepperMap.Infrastructure.Services
         {
             _urlService = urlService;
         }
-        
+
+        public async Task<IEnumerable<Route>> GetRoutesAsync(string destination)
+        {
+            var resultText = await SearchLocation(_urlService.GetMedicalRouteUrl(), destination);
+            return TransformTextResults(resultText);
+        }
+
+        public async Task<Route> GetRouteByNumber(string routeNumber)
+        {
+            var resultText = await SearchLocation(_urlService.GetRouteNumberUrl(), routeNumber);
+            return TransformTextResult(resultText);
+        }
+
         public async Task<IEnumerable<Route>> GetMedicalRoutesAsync(string destination)
         {
             var resultText = await SearchLocation(_urlService.GetMedicalRouteUrl(), destination);
-            return TransformTextResult(resultText);
+            return TransformTextResults(resultText);
         }
 
         public async Task<IEnumerable<Route>> GetPeopleRoutesAsync(string name)
         {
             var resultText = await SearchLocation(_urlService.GetPeopleRouteUrl(), name);
-            return TransformTextResult(resultText);
+            return TransformTextResults(resultText);
         }
 
         public async Task<IEnumerable<Route>> GetPublicRoutesAsync(string destination)
         {
             var resultText = await SearchLocation(_urlService.GetPublicRouteUrl(), destination);
-            return TransformTextResult(resultText);
+            return TransformTextResults(resultText);
         }
 
         private async Task<string> SearchLocation(string url, string destination)
@@ -53,10 +65,17 @@ namespace PepperMap.Infrastructure.Services
             return webserviceLocationQueryUrl;
         }
 
-        private IEnumerable<Route> TransformTextResult(string input)
+        private IEnumerable<Route> TransformTextResults(string input)
         {
             return JsonConvert.DeserializeObject<IEnumerable<Route>>(input)
                 ?? new List<Route>();
         }
+
+        private Route TransformTextResult(string input)
+        {
+            return JsonConvert.DeserializeObject<Route>(input)
+                ?? new Route();
+        }
+
     }
 }

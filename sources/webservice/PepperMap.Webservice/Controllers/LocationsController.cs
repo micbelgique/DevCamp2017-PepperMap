@@ -11,24 +11,26 @@ namespace PepperMap.Webservice.Controllers
     {
 
         private readonly IRouteService _routeService;
+        private readonly ILocationService _locationService;
 
-        public LocationsController(IRouteService routeService)
+        public LocationsController(IRouteService routeService, ILocationService locationService)
         {
             _routeService = routeService;
+            _locationService = locationService;
         }
 
         // GET api/locations/{id}
         [HttpGet("{id}")]
         public async Task<Route> Get(int id)
         {
-            return await _routeService.GetRouteAsync(id);
+            return await _locationService.GetRouteAsync(id);
         }
 
         // GET api/values/5
         [HttpGet("search/{param}")]
         public async Task<IEnumerable<Route>> Search(string param)
         {
-            return await _routeService.GetPublicRoutesAsync(param);
+            return await _locationService.GetPublicRoutesAsync(param);
         }
 
 
@@ -36,7 +38,7 @@ namespace PepperMap.Webservice.Controllers
         [HttpGet("search/{param}/medical")]
         public async Task<IEnumerable<Route>> SearchMedicalRoute(string param)
         {
-            return await _routeService.GetMedicalRoutesAsync(param);
+            return await _locationService.GetMedicalRoutesAsync(param);
         }
 
     }

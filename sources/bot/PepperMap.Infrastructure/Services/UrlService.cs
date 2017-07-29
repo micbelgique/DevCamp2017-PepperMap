@@ -1,7 +1,9 @@
-﻿using PepperMap.Infrastructure.Interfaces;
+﻿using System;
+using PepperMap.Infrastructure.Interfaces;
 
 namespace PepperMap.Infrastructure.Services
 {
+    [Serializable]
     public class UrlService : IUrlService
     {
         private readonly ISettingService _settingService;
@@ -25,7 +27,11 @@ namespace PepperMap.Infrastructure.Services
         public string GetPeopleRouteUrl()
         {
             return _settingService.GetSetting("WebservicePeopleLocationQueryUrl");
+        }
 
+        public string GetRouteNumberUrl()
+        {
+            return _settingService.GetSetting("WebserviceRouteNumberQueryUrl");
         }
     }
 }

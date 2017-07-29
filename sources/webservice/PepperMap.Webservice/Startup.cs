@@ -32,6 +32,7 @@ namespace PepperMap.Webservice
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddScoped<IRouteService, RouteService>();
+            services.AddScoped<ILocationService, LocationService>();
             services.AddScoped<IPersonService, PersonService>();
 
             // Add framework services.
