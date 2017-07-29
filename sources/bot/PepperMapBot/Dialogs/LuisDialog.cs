@@ -32,7 +32,7 @@ namespace PepperMapBot.Dialogs
         public async Task None(IDialogContext context, LuisResult result)
         {
             await context.PostAsync($"Désolé je ne comprends pas '{result.Query}'.");
-            await context.PostAsync(" Avez-vous un rendez-vous ou est-ce que vous cherchez un service ?");
+            await context.PostAsync("Avez-vous un rendez-vous ou est-ce que vous cherchez un service ?");
             context.Wait(this.MessageReceived);
         }
 
@@ -52,7 +52,6 @@ namespace PepperMapBot.Dialogs
             }
 
             await context.PostAsync(message);
-
             context.Wait(this.MessageReceived);
         }
 
@@ -60,57 +59,87 @@ namespace PepperMapBot.Dialogs
         public async Task Hello(IDialogContext context, LuisResult result)
         {
             await context.PostAsync("Bonjour. Je m'appelle Hypolite, à votre service ! Avez-vous un rendez-vous ? ou cherchez vous un de nos services ?");
-            context.Wait(AfterHelloVisitOrMeeting);
+            context.Wait(this.MessageReceived);
+        }
+
+        [LuisIntent("SpecificDestination")]
+        public async Task SpecificDestination(IDialogContext context, LuisResult result)
+        {
+            if (result.Entities == null || result.Entities.Count == 0)
+            {
+                await context.PostAsync("Je n'ai pas bien compris, quel service cherchez-vous ?");
+                context.Wait(this.MessageReceived);
+
+            }
+            foreach (var entity in result.Entities)
+            {
+                var routes = await this.Routes.GetRoutesAsync(entity.Entity);
+                await context.PostAsync($"Pour vous rendre en '{entity.Entity}', suivez la route '{routes.FirstOrDefault()}'");
+            }
         }
 
         [LuisIntent("Meeting")]
         public async Task Meeting(IDialogContext context, LuisResult result)
         {
-            //if(result.Entities > 0)
-            //{
-            //    // Service defined in intent, don't ask user
-            //}
-
-            context.Wait(this.MeetingDetectedAskForService);
+            if(result.Entities.Count > 0)
+            {
+                // Service defined in intent, don't ask user
+                foreach (var entity in result.Entities)
+                {
+                    var routes = await this.Routes.GetRoutesAsync(entity.Entity);
+                    await context.PostAsync($"Pour vous rendre en '{entity.Entity}', suivez la route '{routes.FirstOrDefault()}'");
+                }
+                context.Done(new object { });
+            }
+            else
+            {
+                // ask for service
+                await context.PostAsync("Dans quel service ?");
+                context.Wait(this.MeetingDetectedAskForService);
+            }
         }
 
         #endregion
         private async Task MeetingDetectedAskForService(IDialogContext context, IAwaitable<IMessageActivity> item)
         {
-            await context.Forward(new LuisDialog(this.Routes), null , string.Empty, CancellationToken.None);
-            context.Wait(this.MessageReceived);
+            await MessageReceived(context, item);
         }
 
-        private async Task AfterHelloVisitOrMeeting(IDialogContext context, IAwaitable<IMessageActivity> item)
-        {
-            var message = await item;
-            string text = message.Text;
-            if (text.ToUpper().Contains("RENDEZ") || text.ToUpper().Contains("RDV"))
-            {
-                context.Wait(this.MeetingDetectedAskForService);
-            }
-            else
-            {
-                if (text.ToUpper().Contains("CHERCHE"))
-                {
-                    await context.PostAsync("Est-ce que vous cherchez un de nos services ?");
-                    context.Wait(this.AfterIdentityUserTypePatientSimpleAnswer);
-                }
-            }
-        }
+        //protected override Task MessageReceived(IDialogContext context, IAwaitable<IMessageActivity> item)
+        //{
+        //    return base.MessageReceived(context, item);
+        //}
 
-        public async Task AfterIdentityUserTypePatientSimpleAnswer(IDialogContext context, IAwaitable<IMessageActivity> item)
-        {
-            var message = await item;
-            string text = message.Text;
-            if (text.ToUpper().Contains("OUI"))
-                await context.PostAsync("Quel service cherchez vous ?");
+        //private async Task AfterHelloVisitOrMeeting(IDialogContext context, IAwaitable<IMessageActivity> item)
+        //{
+        //    var message = await item;
+        //    string text = message.Text;
+        //    if (text.ToUpper().Contains("RENDEZ") || text.ToUpper().Contains("RDV"))
+        //    {
+        //        context.Wait(this.MeetingDetectedAskForService);
+        //    }
+        //    else
+        //    {
+        //        if (text.ToUpper().Contains("CHERCHE"))
+        //        {
+        //            await context.PostAsync("Est-ce que vous cherchez un de nos services ?");
+        //            context.Wait(this.AfterIdentityUserTypePatientSimpleAnswer);
+        //        }
+        //    }
+        //}
 
-            if (text.ToUpper().Contains("NON"))
-                await context.PostAsync("Comment puis-je vous aider ?");
+        //public async Task AfterIdentityUserTypePatientSimpleAnswer(IDialogContext context, IAwaitable<IMessageActivity> item)
+        //{
+        //    var message = await item;
+        //    string text = message.Text;
+        //    if (text.ToUpper().Contains("OUI"))
+        //        await context.PostAsync("Quel service cherchez vous ?");
 
-            context.Done(new object { });
-        }
+        //    if (text.ToUpper().Contains("NON"))
+        //        await context.PostAsync("Comment puis-je vous aider ?");
+
+        //    context.Done(new object { });
+        //}
 
     }
 }
