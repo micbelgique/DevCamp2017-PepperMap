@@ -1,18 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Text;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+﻿using System.Linq;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using GalaSoft.MvvmLight.Messaging;
 using PepperUWP.Messages;
 using PepperUWP.ViewModels;
@@ -35,7 +23,9 @@ namespace PepperUWP
 
         private async void OnMessageReceived(StreamToPlayMessage obj)
         {
+            // ListView.ScrollIntoView(ListView.Items.Last());
             await MediaElement.PlayStreamAsync(obj.Stream);
+
         }
 
         private void MainPage_OnLoaded(object sender, RoutedEventArgs e)

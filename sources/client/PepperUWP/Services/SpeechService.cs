@@ -19,6 +19,7 @@ namespace PepperUWP.Services
 
         public SpeechService()
         {
+
         }
 
         private async void ContinuousRecognitionSession_ResultGenerated(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionResultGeneratedEventArgs args)
@@ -28,7 +29,6 @@ namespace PepperUWP.Services
                 args.Result.Confidence == SpeechRecognitionConfidence.High)
             {
                 Debug.Write($"Listen : {args.Result.Text}");
-                //_dictatedTextBuilder.Append( + " ");
                 OnResultGenerated(args.Result.Text);
             }
         }
@@ -36,21 +36,6 @@ namespace PepperUWP.Services
         private async void ContinuousRecognitionSession_Completed(SpeechContinuousRecognitionSession sender, SpeechContinuousRecognitionCompletedEventArgs args)
         {
             Start();
-            //if (args.Status == SpeechRecognitionResultStatus.TimeoutExceeded
-            //    || args.Status == SpeechRecognitionResultStatus.Success
-            //    || args.Status == SpeechRecognitionResultStatus.UserCanceled)
-            //{
-            //    var sentence = _dictatedTextBuilder.ToString();
-
-            //    if (!string.IsNullOrWhiteSpace(sentence))
-            //    {
-            //        OnResultGenerated(sentence);
-            //    }
-            //}
-            //else
-            //{
-            //    Start();
-            //}
         }
 
         public async Task Init()
