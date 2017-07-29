@@ -53,7 +53,7 @@ namespace PepperMapBot.Dialogs
             foreach (var entity in result.Entities)
             {
                 var routes = await this.Routes.GetPublicRoutesAsync(entity.Entity);
-                
+
                 if (routes.Count() > 1)
                 {
                     PreSelectedRoutes = routes.ToArray();
@@ -87,6 +87,7 @@ namespace PepperMapBot.Dialogs
             string text = message.Text;
 
             var route = PreSelectedRoutes.FirstOrDefault(r => r.DestinationName.IsComparableTo(text));
+
             if (route == null)
                 route = (await this.Routes.GetPublicRoutesAsync(text))?.FirstOrDefault();
 
@@ -103,10 +104,10 @@ namespace PepperMapBot.Dialogs
             context.Wait(this.MessageReceived);
         }
 
-       [LuisIntent("Meeting")]
+        [LuisIntent("Meeting")]
         public async Task Meeting(IDialogContext context, LuisResult result)
         {
-            if(result.Entities.Count > 0)
+            if (result.Entities.Count > 0)
             {
                 // Service defined in intent, don't ask user
                 foreach (var entity in result.Entities)
