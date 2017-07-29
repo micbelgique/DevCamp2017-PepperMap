@@ -1,0 +1,60 @@
+@model PepperMap.BackOffice.Data.Models.Route
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Create</h2>
+
+<form asp-action="Create">
+    <div class="form-horizontal">
+        <h4>Route</h4>
+        <hr />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Number" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <input asp-for="Number" class="form-control" />
+                <span asp-validation-for="Number" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Indicator" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="Indicator" class="form-control">
+                    <option value="rez">Rez</option>
+                    <option value="A">A</option>
+                    <option value="B">B</option>
+                    <option value="C">C</option>
+                    <option value="D">D</option>
+                    <option value="E">E</option>
+                </select>
+                <span asp-validation-for="Indicator" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <label asp-for="Flag" class="col-md-2 control-label"></label>
+            <div class="col-md-10">
+                <select asp-for="Flag" class="form-control">
+                    <option value="All">All</option>
+                    <option value="Public">Public</option>
+                    <option value="Medical">Medical</option>
+                </select>
+                <span asp-validation-for="Flag" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
