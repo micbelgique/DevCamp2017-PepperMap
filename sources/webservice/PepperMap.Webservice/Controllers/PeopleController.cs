@@ -11,24 +11,48 @@ namespace PepperMap.Webservice.Controllers
     {
 
         private readonly IRouteService _routeService;
+        private readonly IPersonService _personService;
 
-        public PeopleController(IRouteService routeService)
+        public PeopleController(IRouteService routeService, IPersonService personService)
         {
             _routeService = routeService;
+            _personService = personService;
         }
 
-        // GET api/locations/{id}
         [HttpGet("{id}")]
         public async Task<Route> Get(int id)
         {
             return await _routeService.GetPersonAsync(id);
         }
 
-        // GET api/values/5
         [HttpGet("search/{param}")]
         public async Task<IEnumerable<Route>> Search(string param)
         {
             return await _routeService.GetPersonAsync(param);
+        }
+
+        [HttpGet("list")]
+        public async Task<IEnumerable<Person>> Get()
+        {
+            return await _personService.GetPatientAsync();
+        }
+
+        [HttpGet("list/{filter}")]
+        public async Task<IEnumerable<Person>> Get(string filter)
+        {
+            return await _personService.GetPatientAsync(filter);
+        }
+
+        [HttpGet("staff/list")]
+        public async Task<IEnumerable<Person>> GetStaff()
+        {
+            return await _personService.GetStaffAsync();
+        }
+
+        [HttpGet("staff/list/{filter}")]
+        public async Task<IEnumerable<Person>> GetStaff(string filter)
+        {
+            return await _personService.GetStaffAsync(filter);
         }
 
     }

@@ -17,10 +17,8 @@
             {
                 case PersonType.Patient:
                     return $"patient {Lastname} {Firstname}";
-                case PersonType.Medecin:
-                    return $"Medecin {Lastname} {Firstname} dans le service {Service}";
-                case PersonType.Nurse:
-                    return $"Infimièr(e) {Lastname} {Firstname} dans le service {Service}";
+                case PersonType.Staff:
+                    return $"medecin {Lastname} {Firstname} dans le service {Service}";
                 default:
                     return $"not found";
             }
@@ -29,8 +27,7 @@
 
     public enum PersonType
     {
-        Patient = 0,
-        Medecin = 1,
-        Nurse = 2,
+        Patient = 1,
+        Staff = 2
     }
 }
