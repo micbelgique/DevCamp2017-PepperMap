@@ -76,3 +76,5 @@ artifacts/
 
 # Secrets
 /sources/client/PepperUWP/Secrets.cs
+/sources/bot/PepperMapBot/Properties/PublishProfiles/peppermap-bot - FTP.pubxml
+/sources/bot/PepperMapBot/Properties/PublishProfiles/peppermap-bot - Web Deploy.pubxml

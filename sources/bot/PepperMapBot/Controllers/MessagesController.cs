@@ -2,11 +2,12 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Mvc;
 using Microsoft.Bot.Builder.Dialogs;
 using Microsoft.Bot.Connector;
-using PepperMapBot.Controllers;
+using PepperMap.Infrastructure.Interfaces;
 
-namespace PepperMapBot
+namespace PepperMapBot.Controllers
 {
     [BotAuthentication]
     public class MessagesController : BaseController
@@ -19,7 +20,7 @@ namespace PepperMapBot
         {
             if (activity.Type == ActivityTypes.Message)
             {
-                await Conversation.SendAsync(activity, () => new Dialogs.LuisDialog(this.Routes));
+                await Conversation.SendAsync(activity, () => new Dialogs.LuisDialog(RouteService));
             }
             else
             {
