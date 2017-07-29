@@ -22,7 +22,7 @@ namespace PepperMap.BackOffice.Controllers
         // GET: Routes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Routes.ToListAsync());
+            return View(await _context.Routes.OrderBy(r => r.Number).ToListAsync());
         }
 
         // GET: Routes/Details/5

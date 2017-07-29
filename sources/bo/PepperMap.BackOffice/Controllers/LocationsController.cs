@@ -22,7 +22,7 @@ namespace PepperMap.BackOffice.Controllers
         // GET: Locations
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Locations.Include(l => l.Route);
+            var applicationDbContext = _context.Locations.Include(l => l.Route).OrderBy(l => l.Name);
             return View(await applicationDbContext.ToListAsync());
         }
 

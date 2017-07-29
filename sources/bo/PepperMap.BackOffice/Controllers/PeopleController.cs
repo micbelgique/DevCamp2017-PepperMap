@@ -16,13 +16,13 @@ namespace PepperMap.BackOffice.Controllers
 
         public PeopleController(ApplicationDbContext context)
         {
-            _context = context;    
+            _context = context;
         }
 
         // GET: People
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.People.Include(p => p.Location);
+            var applicationDbContext = _context.People.Include(p => p.Location).OrderBy(p => p.Lastname).ThenBy(p => p.Firstname);
             return View(await applicationDbContext.ToListAsync());
         }
 
