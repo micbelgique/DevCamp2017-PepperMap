@@ -106,20 +106,29 @@ namespace PepperMapBot.Dialogs
        [LuisIntent("Meeting")]
         public async Task Meeting(IDialogContext context, LuisResult result)
         {
-            if(result.Entities.Count > 0)
+            if (result.Entities.Count > 0)
             {
                 // Service defined in intent, don't ask user
                 foreach (var entity in result.Entities)
                 {
                     string message = string.Empty;
                     var routes = await this.Routes.GetPublicRoutesAsync(entity.Entity);
-                    foreach (Route r in routes)
+                    Route r = routes.ToArray()[0];
+                    if (IsSpecialService(r.DestinationName))
                     {
                         message += $"Pour vous rendre en '{r.DestinationName}', suivez la route '{r.RouteIndication}' - '{r.RouteNumber}";
+                        context.Done(new object { });
                     }
-                    await context.PostAsync(message);
+                    else
+                    {
+                        message = "Est-ce que vous vous êtes inscrits au guichet et payé votre consultation ?";
+                        PreSelectedRoutes = null;
+                        PreSelectedRoutes = new Route[] { r };
+                        await context.PostAsync(message);
+                        context.Wait(this.MeetingDetectedAskForSubscription);
+                    }
+                   
                 }
-                context.Done(new object { });
             }
             else
             {
@@ -128,6 +137,8 @@ namespace PepperMapBot.Dialogs
                 context.Wait(this.MeetingDetectedAskForService);
             }
         }
+
+        #endregion
 
         /// <summary>
         /// Special service that don't require meeting
@@ -142,7 +153,23 @@ namespace PepperMapBot.Dialogs
                 return false;
         }
 
-        #endregion
+        private async Task MeetingDetectedAskForSubscription(IDialogContext context, IAwaitable<IMessageActivity> item)
+        {
+            var message = await item;
+            string text = message.Text;
+            if(text.Contains("oui"))
+            {
+                await context.PostAsync($"Pour vous rendre en '{this.PreSelectedRoutes[0].DestinationName}', suivez la route '{this.PreSelectedRoutes[0].RouteIndication}' - '{this.PreSelectedRoutes[0].RouteNumber}");
+            }
+            else
+            {
+                await context.PostAsync("Merci de vous diriger vers les guichets 1 à 8 pour payer votre consultation");
+                await context.PostAsync("N'hésitez pas à revenir me voir pour trouver votre route");
+            }
+            context.Done(new object { });
+        }
+
+
         private async Task MeetingDetectedAskForService(IDialogContext context, IAwaitable<IMessageActivity> item)
         {
             //var message = await item;
