@@ -1,5 +1,8 @@
-﻿namespace PepperMap.Infrastructure.Models
+﻿using System;
+
+namespace PepperMap.Infrastructure.Models
 {
+    [Serializable]
     public class Route
     {
         public string DestinationName { get; set; }

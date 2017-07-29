@@ -21,7 +21,7 @@ namespace PepperMapBot.Dialogs
     {
         public IRouteService Routes { get; private set; }
 
-        public string[] PreSelectedRoutes { get; set; }
+        public Route[] PreSelectedRoutes { get; set; }
 
         public LuisDialog(IRouteService routesService) : base()
         {
@@ -43,6 +43,8 @@ namespace PepperMapBot.Dialogs
         public async Task Goto(IDialogContext context, LuisResult result)
         {
             string message = string.Empty;
+            PreSelectedRoutes = new Route[] { };
+
             if (result.Entities == null || result.Entities.Count == 0)
             {
                 message = "Je ne connais pas cette destination";
@@ -51,29 +53,47 @@ namespace PepperMapBot.Dialogs
             foreach (var entity in result.Entities)
             {
                 var routes = await this.Routes.GetPublicRoutesAsync(entity.Entity);
+                
                 if (routes.Count() > 1)
                 {
-                    await context.PostAsync("Merci de préciser votre destination parmi : ");
-                    foreach (Route r in routes)
-                    {
-                        message += r.DestinationName;
-                    }
+                    PreSelectedRoutes = routes.ToArray();
 
-                    context.Wait(MultipleDestinationsFound);
+                    message += "Nous avons trouvé plusieurs destination possible.\n\n";
+                    message += "Veuillez préciser votre choix  parmi:\n\n\n\n";
+
+                    foreach (var r in PreSelectedRoutes)
+                    {
+                        message += r.DestinationName + "\n\n";
+                    }
                 }
                 else
                 {
-                    message = $"Pour vous rendre en '{routes.ToArray()[0].DestinationName}', suivez la route '{routes.ToArray()[0].RouteIndication}' - '{routes.ToArray()[0].RouteNumber}";
+                    var firstRoute = routes.FirstOrDefault();
+                    message = $"Pour vous rendre en '{firstRoute.DestinationName}', suivez la route '{firstRoute.RouteIndication}' - '{firstRoute.RouteNumber}";
                 }
             }
 
             await context.PostAsync(message);
-            context.Wait(this.MessageReceived);
+
+            if (PreSelectedRoutes.Length > 0)
+                context.Wait(this.MultipleDestinationsFound);
+            else
+                context.Wait(this.MessageReceived);
         }
 
         private async Task MultipleDestinationsFound(IDialogContext context, IAwaitable<IMessageActivity> item)
         {
+            var message = await item;
+            string text = message.Text;
 
+            var route = PreSelectedRoutes.FirstOrDefault(r => r.DestinationName.IsComparableTo(text));
+            if (route == null)
+                route = (await this.Routes.GetPublicRoutesAsync(text))?.FirstOrDefault();
+
+            if (route != null)
+                await context.PostAsync($"Pour vous rendre en '{route.DestinationName}', suivez la route '{route.RouteIndication}' - '{route.RouteNumber}");
+
+            context.Wait(this.MessageReceived);
         }
 
         [LuisIntent("Hello")]
