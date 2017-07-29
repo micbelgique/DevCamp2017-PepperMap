@@ -125,12 +125,12 @@ namespace PepperMapBot.Dialogs
         #endregion
         private async Task MeetingDetectedAskForService(IDialogContext context, IAwaitable<IMessageActivity> item)
         {
-            //var message = await item;
-            //string text = message.Text;
-            //if(text.ToUpper().Contains("NUCL") || text.ToUpper().Contains("PHYSIQUE") || text.ToUpper().Contains("IMAGERIE"))
-            //{
-            //    await context.PostAsync($"Pour vous rendre en '{entity.Entity}', suivez la route '{routes.FirstOrDefault()}'");
-            //}
+            var message = await item;
+            string text = message.Text;
+            if(IsSpecialService(text))
+            {
+                await context.PostAsync($"servicespécial");
+            }
             await MessageReceived(context, item);
         }
     }
