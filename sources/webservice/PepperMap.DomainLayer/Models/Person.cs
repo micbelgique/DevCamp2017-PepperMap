@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace PepperMap.DomainLayer.Models
+﻿namespace PepperMap.DomainLayer.Models
 {
     public class Person
     {

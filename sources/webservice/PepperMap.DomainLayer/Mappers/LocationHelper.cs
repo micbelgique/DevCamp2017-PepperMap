@@ -3,16 +3,17 @@ using Route = PepperMap.DomainLayer.Models.Route;
 
 namespace PepperMap.DomainLayer.Mappers
 {
-    internal class RouteHelper
+    internal class LocationHelper
     {
-        public static Route MapRoute(Infrastructure.Database.Models.Route route)
+        public static Route MapRoute(Location location)
         {
-            if (route == null) return null;
+            if (location == null) return null;
             return new Route
             {
-                DestinationName = $"Route {route.Number.Trim()}",
-                RouteIndication = route.Indicator.Trim(),
-                RouteNumber = route.Number.Trim()
+                DestinationName = location.Name.Trim(),
+                LocationId = location.Id,
+                RouteIndication = location.Route.Indicator.Trim(),
+                RouteNumber = location.Route.Number.Trim()
             };
         }
 
