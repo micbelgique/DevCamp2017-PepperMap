@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -29,12 +30,12 @@ namespace PepperMap.DomainLayer.Services
 
         public async Task<IEnumerable<Route>> GetPublicRoutesAsync(string location)
         {
-            return await RoutesAsync(location, RouteFlag.Public);
+            return await RoutesAsync(location, (l) => l.Route.Flag == RouteFlag.Public || l.Route.Flag == RouteFlag.All);
         }
 
         public async Task<IEnumerable<Route>> GetMedicalRoutesAsync(string location)
         {
-            return await RoutesAsync(location, RouteFlag.Medical);
+            return await RoutesAsync(location, (l) => l.Route.Flag == RouteFlag.Medical || l.Route.Flag == RouteFlag.All);
         }
 
         public async Task<Route> GetPersonAsync(int id)
@@ -47,10 +48,10 @@ namespace PepperMap.DomainLayer.Services
         {
             param = CleanString(param);
             return (await GetPersonContext()
-                .Where(l => l.Lastname.Contains(param)
-                    || l.Firstname.Contains(param)
-                    || $"{l.Firstname}{l.Lastname}".Contains(param)
-                    || $"{l.Lastname}{l.Firstname}".Contains(param))
+                .Where(l => l.Lastname.ToLowerInvariant().Contains(param)
+                    || l.Firstname.ToLowerInvariant().Contains(param)
+                    || string.Concat(l.Firstname, l.Lastname).ToLowerInvariant().Contains(param)
+                    || string.Concat(l.Lastname, l.Firstname).ToLowerInvariant().Contains(param))
                 .ToListAsync())
                 .Select(RouteHelper.MapRoute);
         }
@@ -70,10 +71,10 @@ namespace PepperMap.DomainLayer.Services
                 .Include(c => c.Route);
         }
 
-        private async Task<IEnumerable<Route>> RoutesAsync(string location, RouteFlag flag)
+        private async Task<IEnumerable<Route>> RoutesAsync(string location, Func<Location, bool> funct)
         {
             return (await GetLocationContext()
-             .Where(l => l.Name.Contains(location) && l.Route.Flag == flag)
+             .Where(l => l.Name.Contains(location) && funct(l))
              .ToListAsync())
              .Select(RouteHelper.MapRoute);
         }
