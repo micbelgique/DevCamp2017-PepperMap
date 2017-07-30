@@ -53,7 +53,7 @@ namespace PepperMapBot.Dialogs
             foreach (var entity in result.Entities)
             {
                 var routes = await this.Routes.GetPublicRoutesAsync(entity.Entity);
-
+                
                 if (routes.Count() > 1)
                 {
                     PreSelectedRoutes = routes.ToArray();
@@ -87,7 +87,6 @@ namespace PepperMapBot.Dialogs
             string text = message.Text;
 
             var route = PreSelectedRoutes.FirstOrDefault(r => r.DestinationName.IsComparableTo(text));
-
             if (route == null)
             {
                 var routeName = text.IsSentenceContains(PreSelectedRoutes.Select(i => i.DestinationName));
@@ -110,7 +109,37 @@ namespace PepperMapBot.Dialogs
             context.Wait(this.MessageReceived);
         }
 
-        [LuisIntent("Meeting")]
+        [LuisIntent("SpecificDestination")]
+        public async Task SpecificDestination(IDialogContext context, LuisResult result)
+        {
+            //Shitty duplicate code - tested fast ;-)
+            if (result.Entities.Count > 0)
+            {
+                // Service defined in intent, don't ask user
+                foreach (var entity in result.Entities)
+                {
+                    string message = string.Empty;
+                    var routes = await this.Routes.GetPublicRoutesAsync(entity.Entity);
+                    Route r = routes.ToArray()[0];
+                    if (IsSpecialService(r.DestinationName))
+                    {
+                        message += $"Pour vous rendre en '{r.DestinationName}', suivez la route '{r.RouteIndication}' - '{r.RouteNumber}";
+                        context.Done(new object { });
+                    }
+                    else
+                    {
+                        message = "Est-ce que vous vous êtes inscrits au guichet et payé votre consultation ?";
+                        PreSelectedRoutes = null;
+                        PreSelectedRoutes = new Route[] { r };
+                        await context.PostAsync(message);
+                        context.Wait(this.MeetingDetectedAskForSubscription);
+                    }
+
+                }
+            }
+        }
+
+       [LuisIntent("Meeting")]
         public async Task Meeting(IDialogContext context, LuisResult result)
         {
             if (result.Entities.Count > 0)
@@ -179,13 +208,7 @@ namespace PepperMapBot.Dialogs
 
         private async Task MeetingDetectedAskForService(IDialogContext context, IAwaitable<IMessageActivity> item)
         {
-            //var message = await item;
-            //string text = message.Text;
-            //if(text.ToUpper().Contains("NUCL") || text.ToUpper().Contains("PHYSIQUE") || text.ToUpper().Contains("IMAGERIE"))
-            //{
-            //    await context.PostAsync($"Pour vous rendre en '{entity.Entity}', suivez la route '{routes.FirstOrDefault()}'");
-            //}
-            await MessageReceived(context, item);
+            await MessageReceived(context, item); // send it back to LUIS
         }
     }
 }
