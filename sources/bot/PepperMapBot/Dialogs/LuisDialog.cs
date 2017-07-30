@@ -21,8 +21,9 @@ namespace PepperMapBot.Dialogs
     {
 
         private const string ASK_SUBSCRIPTION_DONE = "Est-ce que vous vous êtes inscrits au guichet et payé votre consultation ?";
-        private const string HELLO = "Bonjour.Je m'appelle Hypolite, à votre service ! Avez-vous un rendez-vous ? Cherchez vous un de nos services ou un patient ?";
+        private const string HELLO = "Bonjour. Je m'appelle Hypolite, à votre service ! Avez-vous un rendez-vous ? Cherchez vous un de nos services ou un patient ?";
         private const string ASK_SERVICE = "Dans quel service ?";
+        private const string THANKS = "De rien ! Bonne journée !";
 
         public IRouteService Routes { get; private set; }
 
@@ -51,6 +52,13 @@ namespace PepperMapBot.Dialogs
         {
             IsMeeting = false;
             await context.PostAsync(HELLO);
+            context.Wait(this.MessageReceived);
+        }
+
+        [LuisIntent("Thanks")]
+        public async Task Thanks(IDialogContext context, LuisResult result)
+        {
+            await context.PostAsync(THANKS);
             context.Wait(this.MessageReceived);
         }
 
