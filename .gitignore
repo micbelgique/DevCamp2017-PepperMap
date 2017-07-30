@@ -72,6 +72,9 @@ artifacts/
 *.log 
 *.vspscc 
 *.vssscc 
-Merge branch 'master' of https://github.com/micbelgique/DevCamp2017-Team1
+
+
+# Secrets
+/sources/client/PepperUWP/Secrets.cs
 /sources/bot/PepperMapBot/Properties/PublishProfiles/peppermap-bot - FTP.pubxml
 /sources/bot/PepperMapBot/Properties/PublishProfiles/peppermap-bot - Web Deploy.pubxml
