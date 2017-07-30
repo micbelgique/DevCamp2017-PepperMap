@@ -23,7 +23,7 @@ namespace PepperUWP
 
         private async void OnMessageReceived(StreamToPlayMessage obj)
         {
-            // ListView.ScrollIntoView(ListView.Items.Last());
+            ListView.ScrollIntoView(ListView.Items.Last());
             await MediaElement.PlayStreamAsync(obj.Stream);
 
         }
