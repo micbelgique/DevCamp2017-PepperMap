@@ -13,6 +13,13 @@ Qui ne s’est jamais perdu dans le dédale des routes d’un hôpital ? Le CHR 
 ### Technologies 
  
 Chatbots, intelligence de langage, cognitives services  
+
+Vu l'absence de Pepper durant le weekend, une application UWP a été développeée pour montrer l'utilisation de la reconnaissance vocale. Cette app n'est qu'une interface possible pour utiliser le service. Ce service est également accessible via d'autres canaux, tels que Messenger, Skype, ...
+
+La reconnaissance vocale n'est pas très fiable, et il serait intéressant de tester l'utilisation d'un service cloud tel que [CRIS](https://cris.ai/). 
+
+![Architecture](assets/Architecture.png)
+
  
 ### Matériel mis à disposition 
  
