@@ -89,6 +89,12 @@ namespace PepperMapBot.Dialogs
             var route = PreSelectedRoutes.FirstOrDefault(r => r.DestinationName.IsComparableTo(text));
 
             if (route == null)
+            {
+                var routeName = text.IsSentenceContains(PreSelectedRoutes.Select(i => i.DestinationName));
+                route = PreSelectedRoutes.FirstOrDefault(i => i.DestinationName == routeName);
+            }
+
+            if (route == null)
                 route = (await this.Routes.GetPublicRoutesAsync(text))?.FirstOrDefault();
 
             if (route != null)
