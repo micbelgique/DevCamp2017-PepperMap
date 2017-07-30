@@ -19,9 +19,16 @@ namespace PepperMapBot.Dialogs
     [Serializable]
     public class LuisDialog : LuisDialog<object>
     {
+
+        private const string ASK_SUBSCRIPTION_DONE = "Est-ce que vous vous êtes inscrits au guichet et payé votre consultation ?";
+        private const string HELLO = "Bonjour.Je m'appelle Hypolite, à votre service ! Avez-vous un rendez-vous ? Cherchez vous un de nos services ou un patient ?";
+        private const string ASK_SERVICE = "Dans quel service ?";
+
         public IRouteService Routes { get; private set; }
 
         public Route[] PreSelectedRoutes { get; set; }
+
+        public bool IsMeeting { get; set; }
 
         public LuisDialog(IRouteService routesService) : base()
         {
@@ -39,46 +46,79 @@ namespace PepperMapBot.Dialogs
             context.Wait(this.MessageReceived);
         }
 
+        [LuisIntent("Hello")]
+        public async Task Hello(IDialogContext context, LuisResult result)
+        {
+            IsMeeting = false;
+            await context.PostAsync(HELLO);
+            context.Wait(this.MessageReceived);
+        }
+
         [LuisIntent("GoTo")]
         public async Task Goto(IDialogContext context, LuisResult result)
         {
             string message = string.Empty;
             PreSelectedRoutes = new Route[] { };
-
-            if (result.Entities == null || result.Entities.Count == 0)
+            if (IsMeeting)
             {
-                message = "Je ne connais pas cette destination";
-            }
-
-            foreach (var entity in result.Entities)
-            {
-                var routes = await this.Routes.GetPublicRoutesAsync(entity.Entity);
-                
-                if (routes.Count() > 1)
+                // Service defined in intent, don't ask user
+                foreach (var entity in result.Entities)
                 {
-                    PreSelectedRoutes = routes.ToArray();
-
-                    message += "Nous avons trouvé plusieurs destination possible.\n\n";
-                    message += "Veuillez préciser votre choix  parmi:\n\n\n\n";
-
-                    foreach (var r in PreSelectedRoutes)
+                    var routes = await this.Routes.GetPublicRoutesAsync(entity.Entity);
+                    Route r = routes.ToArray()[0];
+                    if (IsSpecialService(r.DestinationName))
                     {
-                        message += r.DestinationName + "\n\n";
+                        message += $"Pour vous rendre en '{r.DestinationName}', suivez la route '{r.RouteIndication}' - '{r.RouteNumber}";
+                        context.Done(new object { });
+                    }
+                    else
+                    {
+                        message = ASK_SUBSCRIPTION_DONE;
+                        PreSelectedRoutes = null;
+                        PreSelectedRoutes = new Route[] { r };
+                        await context.PostAsync(message);
+                        context.Wait(this.MeetingDetectedAskForSubscription);
                     }
                 }
-                else
-                {
-                    var firstRoute = routes.FirstOrDefault();
-                    message = $"Pour vous rendre en '{firstRoute.DestinationName}', suivez la route '{firstRoute.RouteIndication}' - '{firstRoute.RouteNumber}";
-                }
             }
-
-            await context.PostAsync(message);
-
-            if (PreSelectedRoutes.Length > 0)
-                context.Wait(this.MultipleDestinationsFound);
             else
-                context.Wait(this.MessageReceived);
+            {
+
+                if (result.Entities == null || result.Entities.Count == 0)
+                {
+                    message = "Je ne connais pas cette destination";
+                }
+
+                foreach (var entity in result.Entities)
+                {
+                    var routes = await this.Routes.GetPublicRoutesAsync(entity.Entity);
+
+                    if (routes.Count() > 1)
+                    {
+                        PreSelectedRoutes = routes.ToArray();
+
+                        message += "Nous avons trouvé plusieurs destination possible.\n\n";
+                        message += "Veuillez préciser votre choix  parmi:\n\n\n\n";
+
+                        foreach (var r in PreSelectedRoutes)
+                        {
+                            message += r.DestinationName + "\n\n";
+                        }
+                    }
+                    else
+                    {
+                        var firstRoute = routes.FirstOrDefault();
+                        message = $"Pour vous rendre en '{firstRoute.DestinationName}', suivez la route '{firstRoute.RouteIndication}' - '{firstRoute.RouteNumber}";
+                    }
+                }
+
+                await context.PostAsync(message);
+
+                if (PreSelectedRoutes.Length > 0)
+                    context.Wait(this.MultipleDestinationsFound);
+                else
+                    context.Wait(this.MessageReceived);
+            }
         }
 
         private async Task MultipleDestinationsFound(IDialogContext context, IAwaitable<IMessageActivity> item)
@@ -96,12 +136,7 @@ namespace PepperMapBot.Dialogs
             context.Wait(this.MessageReceived);
         }
 
-        [LuisIntent("Hello")]
-        public async Task Hello(IDialogContext context, LuisResult result)
-        {
-            await context.PostAsync("Bonjour. Je m'appelle Hypolite, à votre service ! Avez-vous un rendez-vous ? Cherchez vous un de nos services ou un patient ?");
-            context.Wait(this.MessageReceived);
-        }
+      
 
         [LuisIntent("SpecificDestination")]
         public async Task SpecificDestination(IDialogContext context, LuisResult result)
@@ -122,7 +157,7 @@ namespace PepperMapBot.Dialogs
                     }
                     else
                     {
-                        message = "Est-ce que vous vous êtes inscrits au guichet et payé votre consultation ?";
+                        message = ASK_SUBSCRIPTION_DONE;
                         PreSelectedRoutes = null;
                         PreSelectedRoutes = new Route[] { r };
                         await context.PostAsync(message);
@@ -136,6 +171,7 @@ namespace PepperMapBot.Dialogs
        [LuisIntent("Meeting")]
         public async Task Meeting(IDialogContext context, LuisResult result)
         {
+            IsMeeting = true;
             if (result.Entities.Count > 0)
             {
                 // Service defined in intent, don't ask user
@@ -151,7 +187,7 @@ namespace PepperMapBot.Dialogs
                     }
                     else
                     {
-                        message = "Est-ce que vous vous êtes inscrits au guichet et payé votre consultation ?";
+                        message = ASK_SUBSCRIPTION_DONE;
                         PreSelectedRoutes = null;
                         PreSelectedRoutes = new Route[] { r };
                         await context.PostAsync(message);
