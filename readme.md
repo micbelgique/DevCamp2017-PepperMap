@@ -20,6 +20,13 @@ La reconnaissance vocale n'est pas très fiable, et il serait intéressant de te
 
 ![Architecture](assets/Architecture.png)
 
+### Démo 
+
+Cliquez sur l'image pour voir la vidéo de démonstration de l'application.
+La vidéo est également disponible dans les [assets](assets).
+
+[![Vidéo de démonstration](assets/youtube-preview.jpg)](https://youtu.be/CVrRN_0neKA)
+
  
 ### Matériel mis à disposition 
  
