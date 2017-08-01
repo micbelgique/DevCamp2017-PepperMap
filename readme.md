@@ -28,3 +28,8 @@ Tablette tactile
 ## License 
  
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details 
+
+## Résultat 
+
+![Présentation Powerpoint](ressources/170728-PepperMap.pptx)
+![Vidéo](https://youtu.be/sCk1AF3tIl0)
